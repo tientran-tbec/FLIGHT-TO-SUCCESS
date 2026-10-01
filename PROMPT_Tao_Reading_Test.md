@@ -788,3 +788,19 @@ EXPLANATIONS của mỗi test, chỉ lọc theo test/passage/dạng).
 Muốn tạo thêm dạng/test mới: chạy lại `python3 gen_all_single_tests.py <tfng|ynng|mcq|matching|completion>`
 trong thư mục làm việc (cần có đủ data1.py..data10.py, build.py, build_single.py,
 engine.css, engine_single.js, by_type.json cùng chỗ).
+
+---
+
+## GHI CHÚ VỊ TRÍ FILE (cập nhật 01/10/2026 — sau khi dọn gọn thư mục)
+
+Thư mục `03. READING` đã được sắp xếp lại cho gọn gàng, các đường dẫn dưới đây
+thay thế mọi tham chiếu vị trí cũ (ở gốc thư mục) trong tài liệu phía trên:
+
+- `01_De_Goc_Word/` — các file Word đề gốc (NEW - TEST 1-5.docx, TEST 6-10.docx, TRỘN KEY 20 TEST.docx)
+- `02_WebTest_FullTest/` — 10 file Test1_Reading.html … Test10_Reading.html (bản đầy đủ 3 passage)
+- `03_TaiLieu_TheoDang_Word/` — 5 file Word tổng hợp theo dạng câu hỏi (trước đây ở "Theo dang cau hoi/")
+- `WebTest_TheoDang/` — không đổi (74 web test theo dạng + code.gs)
+- `HUONG_DAN/` — không đổi (file Word hướng dẫn đổi Sheet/Apps Script/GitHub)
+
+`update_links.py` và `push_github.bat` vẫn nằm ở thư mục gốc `03. READING` và hoạt động
+bình thường (quét toàn bộ thư mục con), không cần sửa gì khi cấu trúc trên thay đổi.
