@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>IELTS Reading Test 4</title>
+<style>
+:root{
+  --blue:#1a56b0; --blue-dark:#123e82; --green:#1e8e3e; --red:#d93025; --orange:#e8710a;
+  --gray-bg:#f4f6f8; --border:#d7dde3; --hl-yellow:#FFE066; --hl-green:#90EE90; --hl-pink:#FFB6C1;
+  --sel-orange:#FFD580;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;height:100%;font-family:"Segoe UI",Arial,sans-serif;color:#1b1f23;background:#fff;}
+body{user-select:none;}
+input[type="text"],select,textarea{user-select:text;}
+.passage-panel, .question-panel{user-select:text;}
+input,select,textarea{font-family:inherit;font-size:14px;}
+@media print{ body{display:none !important;} }
+
+/* ---------- Popup ---------- */
+#nameOverlay{position:fixed;inset:0;background:rgba(10,20,40,.78);display:flex;align-items:center;justify-content:center;z-index:9999;}
+#nameOverlay.hidden{display:none;}
+.name-box{background:#fff;padding:28px 32px;border-radius:10px;width:360px;max-width:92vw;box-shadow:0 12px 40px rgba(0,0,0,.3);}
+.name-box h2{margin:0 0 6px;font-size:19px;color:var(--blue-dark);}
+.name-box p.sub{margin:0 0 18px;font-size:13px;color:#556;}
+.name-box label{display:block;font-size:13px;font-weight:600;margin:10px 0 4px;}
+.name-box input{width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:6px;font-size:14px;user-select:text;}
+.name-box .err{color:var(--red);font-size:12.5px;min-height:18px;margin-top:8px;}
+.name-box button{margin-top:10px;width:100%;padding:11px;background:var(--blue);color:#fff;border:none;border-radius:6px;font-size:15px;font-weight:600;cursor:pointer;}
+.name-box button:hover{background:var(--blue-dark);}
+
+/* ---------- Header ---------- */
+#topbar{position:sticky;top:0;z-index:500;background:#fff;border-bottom:1px solid var(--border);}
+#hlToolbar{display:flex;align-items:center;gap:8px;padding:6px 14px;background:#eef2f7;border-bottom:1px solid var(--border);flex-wrap:wrap;}
+#hlToolbar .lbl{font-size:12.5px;color:#556;margin-right:4px;}
+.hl-btn{width:28px;height:28px;border-radius:50%;border:2px solid transparent;cursor:pointer;}
+.hl-btn[data-c="yellow"]{background:var(--hl-yellow);}
+.hl-btn[data-c="green"]{background:var(--hl-green);}
+.hl-btn[data-c="pink"]{background:var(--hl-pink);}
+.hl-btn.active{border-color:#333;transform:scale(1.15);}
+#eraserBtn{padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:#fff;cursor:pointer;font-size:13px;}
+#eraserBtn.active{background:#333;color:#fff;}
+#penBtn{padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:#fff;cursor:pointer;font-size:13px;}
+#penBtn.active{background:#8a5b00;color:#fff;}
+.pen-color-btn{width:22px;height:22px;border-radius:50%;border:2px solid transparent;cursor:pointer;display:none;vertical-align:middle;}
+.pen-color-btn.show{display:inline-block;}
+.pen-color-btn[data-pc="red"]{background:#e53935;}
+.pen-color-btn[data-pc="blue"]{background:#1e88e5;}
+.pen-color-btn[data-pc="black"]{background:#222;}
+.pen-color-btn.active{border-color:#333;transform:scale(1.15);}
+#penEraserBtn{padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:#fff;cursor:pointer;font-size:13px;display:none;}
+#penEraserBtn.show{display:inline-block;}
+#penEraserBtn.active{background:#333;color:#fff;}
+#dictModeTag{display:none;font-size:12px;color:var(--green);font-weight:700;padding:4px 10px;background:#e6f6ea;border-radius:6px;}
+#dictModeTag.show{display:inline-block;}
+.hl-yellow{background:var(--hl-yellow);}
+.hl-green{background:var(--hl-green);}
+.hl-pink{background:var(--hl-pink);}
+
+#header{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;}
+#tabs{display:flex;gap:6px;}
+.tab-btn{padding:8px 16px;border:1px solid var(--border);background:#f4f6f8;border-radius:6px 6px 0 0;cursor:pointer;font-size:14px;font-weight:600;color:#445;}
+.tab-btn.active{background:var(--blue);color:#fff;border-color:var(--blue);}
+#timerBox{font-size:20px;font-weight:700;padding:6px 14px;border-radius:8px;background:#eef2f7;color:var(--blue-dark);min-width:110px;text-align:center;}
+#timerBox.warn{background:#fff3cd;color:#8a5b00;animation:blink 1s infinite;}
+#timerBox.danger{background:#fbe0de;color:var(--red);animation:blink .5s infinite;}
+@keyframes blink{50%{opacity:.4;}}
+
+/* ---------- Layout ---------- */
+#examArea{display:flex;height:calc(100vh - 128px);}
+.passage-panel{width:50%;overflow-y:auto;padding:18px 22px;border-right:none;background:#fff;}
+#divider{width:6px;cursor:col-resize;background:var(--border);flex-shrink:0;}
+#divider:hover{background:var(--blue);}
+.question-panel{width:50%;overflow-y:auto;padding:18px 22px;background:#fbfcfe;}
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+.passage-title{font-size:19px;font-weight:700;color:var(--blue-dark);margin:4px 0 12px;}
+.passage-instr{font-style:italic;font-size:13px;color:#556;margin-bottom:14px;}
+.passage-panel p{line-height:1.65;margin:0 0 12px;text-align:justify;}
+.subheading{display:inline-block;font-weight:700;color:var(--blue-dark);margin-right:6px;}
+.footnote{font-size:12.5px;color:#667;}
+
+.qgroup{margin-bottom:26px;padding-bottom:18px;border-bottom:1px dashed var(--border);}
+.qgroup:last-child{border-bottom:none;}
+.qgroup h3{font-size:14.5px;margin:0 0 4px;color:var(--blue-dark);}
+.qgroup .instr{font-size:13px;color:#445;margin:0 0 10px;line-height:1.5;}
+.qitem{margin:10px 0;font-size:14px;line-height:1.6;}
+.qnum{display:inline-block;min-width:24px;font-weight:700;color:var(--blue-dark);}
+.opt-row{display:block;margin:4px 0 4px 26px;padding:3px 6px;border-radius:5px;cursor:pointer;}
+.opt-row input{margin-right:8px;}
+.opt-row.selected-answer{background:var(--sel-orange);}
+.opt-row.correct{background:#c8f0d0 !important;}
+.opt-row.incorrect{background:#f8d3d0 !important;}
+select.qselect{padding:5px 6px;border:1px solid var(--border);border-radius:5px;font-size:13.5px;margin-left:6px;min-width:150px;}
+input.qtext{padding:4px 7px;border:1px solid var(--border);border-radius:4px;font-size:13.5px;width:150px;margin:0 3px;}
+input.qtext.correct-cell{background:#c8f0d0;border-color:var(--green);}
+input.qtext.incorrect-cell{background:#f8d3d0;border-color:var(--red);}
+.ans-hint{font-size:12px;color:var(--green);font-weight:600;margin-left:6px;}
+.qnum-inline{display:inline-block;min-width:20px;color:#fff;background:var(--blue);border-radius:4px;font-size:11.5px;text-align:center;padding:1px 4px;margin:0 4px 0 2px;vertical-align:middle;}
+.headinglist, .wordbank, .keylist{background:#eef2f7;border:1px solid var(--border);border-radius:6px;padding:10px 14px;margin-bottom:12px;font-size:13.5px;line-height:1.65;}
+.headinglist div, .wordbank span, .keylist div{margin:2px 0;}
+.wordbank span{display:inline-block;margin-right:16px;}
+table.qtable{width:100%;border-collapse:collapse;margin:10px 0;font-size:13.5px;}
+table.qtable td, table.qtable th{border:1px solid var(--border);padding:7px 9px;vertical-align:top;text-align:left;}
+table.qtable th{background:#eef2f7;}
+.notebox{background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:14px 18px;margin:10px 0;}
+.notebox h4{margin:12px 0 6px;font-size:14px;color:var(--blue-dark);}
+.notebox h4:first-child{margin-top:0;}
+.notebox ul{margin:4px 0 8px;padding-left:20px;}
+.notebox li{margin:4px 0;font-size:13.5px;line-height:1.6;}
+.summarybox{background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:14px 18px;margin:10px 0;font-size:13.5px;line-height:1.85;}
+.summarybox .stitle{font-weight:700;color:var(--blue-dark);display:block;margin-bottom:8px;}
+
+@media (max-width:768px){
+  #examArea{flex-direction:column;height:auto;}
+  .passage-panel, .question-panel{width:100%;height:60vh;}
+  #divider{display:none;}
+  .tab-btn{padding:7px 10px;font-size:12.5px;}
+}
+
+/* ---------- Submit / violation ---------- */
+#submitBtn{position:fixed;right:22px;bottom:22px;z-index:600;background:var(--red);color:#fff;border:none;padding:14px 24px;border-radius:30px;font-size:15px;font-weight:700;box-shadow:0 6px 18px rgba(0,0,0,.25);cursor:pointer;}
+#submitBtn:hover{background:#a80f00;}
+.modal-overlay{position:fixed;inset:0;background:rgba(10,20,40,.65);display:flex;align-items:center;justify-content:center;z-index:9998;}
+.modal-overlay.hidden{display:none;}
+.modal-box{background:#fff;border-radius:10px;padding:24px 26px;width:420px;max-width:92vw;box-shadow:0 12px 40px rgba(0,0,0,.3);}
+.modal-box h3{margin:0 0 10px;color:var(--blue-dark);}
+.modal-actions{display:flex;gap:10px;margin-top:18px;}
+.modal-actions button{flex:1;padding:10px;border-radius:6px;border:none;font-size:14px;font-weight:600;cursor:pointer;}
+.btn-confirm{background:var(--red);color:#fff;}
+.btn-cancel{background:#e4e8ec;color:#333;}
+#resultBox{max-height:70vh;overflow-y:auto;}
+#resultBox table{width:100%;border-collapse:collapse;margin:10px 0;font-size:13.5px;}
+#resultBox td,#resultBox th{border:1px solid var(--border);padding:6px 8px;}
+.band-badge{display:inline-block;background:var(--blue);color:#fff;padding:4px 12px;border-radius:20px;font-weight:700;font-size:15px;}
+#warnBanner{position:fixed;top:0;left:0;right:0;background:var(--red);color:#fff;text-align:center;padding:8px;font-weight:700;z-index:9997;display:none;}
+#fsOverlay{position:fixed;inset:0;background:rgba(10,20,40,.9);color:#fff;display:none;align-items:center;justify-content:center;flex-direction:column;z-index:9996;text-align:center;padding:20px;}
+#fsOverlay button{margin-top:16px;padding:10px 20px;border-radius:6px;border:none;background:var(--blue);color:#fff;font-weight:700;cursor:pointer;font-size:14px;}
+
+/* ---------- Pen (freehand drawing) tool ---------- */
+.passage-panel, .question-panel{position:relative;}
+.draw-layer{position:absolute;top:0;left:0;width:100%;pointer-events:none;z-index:40;}
+.draw-layer.pen-active{pointer-events:auto;cursor:crosshair;}
+.draw-layer.pen-erase{pointer-events:auto;cursor:cell;}
+body.pen-mode .passage-panel, body.pen-mode .question-panel{cursor:crosshair;}
+
+/* ---------- Dictionary popup (post-submit) ---------- */
+.dict-popup{position:fixed;max-width:320px;background:#1b1f23;color:#fff;padding:10px 14px;border-radius:8px;font-size:13px;line-height:1.5;z-index:9995;box-shadow:0 8px 24px rgba(0,0,0,.3);}
+.dict-popup.dict-popup-wide{max-width:480px;}
+.dict-popup b{color:#7fd0ff;}
+.dict-popup .dict-close{position:absolute;top:2px;right:8px;cursor:pointer;color:#aaa;font-size:14px;}
+.dict-popup .dict-body{max-height:56vh;overflow-y:auto;padding-right:4px;}
+.dict-popup .dict-orig{margin-bottom:8px;color:#c9d6e3;}
+.dict-popup .dict-trans{color:#d8ffe0;border-top:1px solid #333;padding-top:8px;}
+.dict-popup .dict-progress{margin-top:8px;color:#ffd166;font-size:12px;font-style:italic;}
+
+/* ---------- Explanation panel (post-submit) ---------- */
+.explain-panel{display:none;margin-top:20px;padding-top:14px;border-top:2px solid var(--blue);}
+.explain-panel h3{color:var(--blue-dark);font-size:15px;margin:0 0 10px;}
+.explain-item{background:#f0f6ff;border:1px solid #cfe0f5;border-radius:6px;padding:8px 12px;margin-bottom:8px;font-size:13px;line-height:1.55;}
+.explain-item b.eq{color:var(--blue-dark);}
+.explain-item .eans{color:var(--green);font-weight:700;}
+.explain-item .etext{color:#334;display:block;margin-top:6px;}
+.explain-item .equote{display:block;margin-top:5px;margin-bottom:2px;font-style:italic;color:#4a5568;background:#fff;border-left:3px solid var(--blue);padding:4px 10px;border-radius:0 4px 4px 0;}
+.explain-item .elang{display:inline-block;font-size:10.5px;font-weight:800;letter-spacing:.03em;color:#fff;background:var(--blue);border-radius:4px;padding:1px 6px;margin-right:6px;vertical-align:middle;}
+.explain-item .etext-vi .elang{background:var(--green);}
+.explain-item .etext-en{font-style:normal;}
+
+</style>
+</head>
+<body>
+
+<div id="nameOverlay">
+  <div class="name-box">
+    <h2>IELTS Reading Test 4</h2>
+    <p class="sub">Vui lòng nhập thông tin để bắt đầu làm bài (thời gian: 60 phút, 40 câu hỏi).</p>
+    <label>Họ và tên</label>
+    <input type="text" id="stuName" placeholder="Nguyễn Văn A">
+    <label>Lớp</label>
+    <input type="text" id="stuClass" placeholder="10A1">
+    <div class="err" id="nameErr"></div>
+    <button onclick="startExam()">Bắt đầu làm bài</button>
+  </div>
+</div>
+
+<div id="warnBanner"></div>
+<div id="fsOverlay">
+  <div>⚠ Bạn đã thoát chế độ toàn màn hình. Vi phạm đã được ghi nhận.</div>
+  <button onclick="enterFullscreen()">Vào toàn màn hình</button>
+</div>
+
+<div id="topbar">
+  <div id="hlToolbar">
+    <span class="lbl">Highlight:</span>
+    <button class="hl-btn" data-c="yellow" title="Vàng"></button>
+    <button class="hl-btn" data-c="green" title="Xanh lá"></button>
+    <button class="hl-btn" data-c="pink" title="Hồng"></button>
+    <button id="eraserBtn" title="Tẩy">🧹 Tẩy</button>
+    <button id="penBtn" title="Bút viết">🖊️ Bút</button>
+    <button class="pen-color-btn" data-pc="red" title="Đỏ"></button>
+    <button class="pen-color-btn" data-pc="blue" title="Xanh dương"></button>
+    <button class="pen-color-btn" data-pc="black" title="Đen"></button>
+    <button id="penEraserBtn" title="Xóa nét bút">🧽 Xóa nét</button>
+    <span id="dictModeTag">📖 Đã mở tra từ: click đúp vào từ hoặc bôi đen đoạn văn để dịch</span>
+  </div>
+  <div id="header">
+    <div id="tabs">
+      <button class="tab-btn active" id="tabBtn-0" onclick="showPassage(0)">Passage 1</button>
+      <button class="tab-btn" id="tabBtn-1" onclick="showPassage(1)">Passage 2</button>
+      <button class="tab-btn" id="tabBtn-2" onclick="showPassage(2)">Passage 3</button>
+    </div>
+    <div id="timerBox">60:00</div>
+  </div>
+</div>
+
+<div id="examArea">
+  <div class="passage-panel tab-content active" id="passage-0">
+<div class="passage-title">The development of the London underground railway</div>
+<div class="passage-instr">You should spend about 20 minutes on Questions 1-13 which are based on Reading Passage 1 below.</div>
+<p>In the first half of the 1800s, London’s population grew at an astonishing rate, and the central area became increasingly congested. In addition, the expansion of the overground railway network resulted in more and more passengers arriving in the capital. However, in 1846, a Royal Commission decided that the railways should not be allowed to enter the City, the capital’s historic and business centre. The result was that the overground railway stations formed a ring around the City. The area within consisted of poorly built, overcrowded slums and the streets were full of horse-drawn traffic. Crossing the City became a nightmare. It could take an hour and a half to travel 8 km by horse-drawn carriage or bus. Numerous schemes were proposed to resolve these problems, but few succeeded.</p>
+<p>Amongst the most vocal advocates for a solution to London’s traffic problems was Charles Pearson, who worked as a solicitor for the City of London. He saw both social and economic advantages in building an underground railway that would link the overground railway stations together and clear London slums at the same time. His idea was to relocate the poor workers who lived in the inner-city slums to newly constructed suburbs, and to provide cheap rail travel for them to get to work. Pearson’s ideas gained support amongst some businessmen and in 1851 he submitted a plan to Parliament. It was rejected, but coincided with a proposal from another group for an underground connecting line, which Parliament passed.</p>
+<p>The two groups merged and established the Metropolitan Railway Company in August 1854. The company’s plan was to construct an underground railway line from the Great Western Railway’s (GWR) station at Paddington to the edge of the City at Farringdon Street – a distance of almost 5 km. The organisation had difficulty in raising the funding for such a radical and expensive scheme, not least because of the critical articles printed by the press. Objectors argued that the tunnels would collapse under the weight of traffic overhead, buildings would be shaken and passengers would be poisoned by the emissions from the train engines. However, Pearson and his partners persisted.</p>
+<p>The GWR, aware that the new line would finally enable them to run trains into the heart of the City, invested almost £250,000 in the scheme. Eventually, over a five-year period, £1m was raised. The chosen route ran beneath existing main roads to minimise the expense of demolishing buildings. Originally scheduled to be completed in 21 months, the construction of the underground line took three years. It was built just below street level using a technique known as ‘cut and cover’. A trench about ten metres wide and six metres deep was dug, and the sides temporarily help up with timber beams. Brick walls were then constructed, and finally a brick arch was added to create a tunnel. A two-metre-deep layer of soil was laid on top of the tunnel and the road above rebuilt.</p>
+<p>The Metropolitan line, which opened on 10 January 1863, was the world’s first underground railway. On its first day, almost 40,000 passengers were carried between Paddington and Farringdon, the journey taking about 18 minutes. By the end of the Metropolitan’s first year of operation, 9.5 million journeys had been made.</p>
+<p>Even as the Metropolitan began operation, the first extensions to the line were being authorised; these were built over the next five years, reaching Moorgate in the east to London and Hammersmith in the west. The original plan was to pull the trains with steam locomotives, using firebricks in the boilers to provide steam, but these engines were never introduced. Instead, the line used specially designed locomotives that were fitted with water tanks in which steam could be condensed. However, smoke and fumes remained a problem, even though ventilation shafts were added to the tunnels.</p>
+<p>Despite the extension of the underground railway, by the 1880s, congestion on London’s streets had become worse. The problem was partly that the existing underground lines formed a circuit around the centre of London and extended to the suburbs, but did not cross the capital’s centre. The ‘cut and cover’ method of construction was not an option in this part of the capital. The only alternative was to tunnel deep underground.</p>
+<p>Although the technology to create these tunnels existed, steam locomotives could not be used in such a confined space. It wasn’t until the development of a reliable electric motor, and a means of transferring power from the generator to a moving train, that the world’s first deep-level electric railway, the City &amp; South London, became possible. The line opened in 1890, and ran from the City to Stockwell, south of the River Thames. The trains were made up of three carriages and driven by electric engines. The carriages were narrow and had tiny windows just below the roof because it was thought that passengers would not want to look out at the tunnel walls. The line was not without its problems, mainly caused by an unreliable power supply. Although the City &amp; South London Railway was a great technical achievement, it did not make a profit. Then, in 1900, the Central London Railway, known as the ‘Tuppenny Tube’, began operation using new electric locomotives. It was very popular and soon afterwards new railways and extensions were added to the growing tube network. By 1907, the heart of today’s Underground system was in place.</p>
+
+  </div>
+  <div id="divider"></div>
+  <div class="question-panel tab-content active" id="questions-0">
+<div class="qgroup">
+<h3>Questions 1-6</h3>
+<div class="instr">Complete the notes below.</div>
+<div class="instr">Choose ONE WORD ONLY from the passage for each answer.</div>
+<div class="instr">Write your answers in boxes 1-6 on your answer sheet.</div>
+<div class="notebox"><h4>The problem</h4><ul><li>The <b class="qnum-inline">1</b><input type="text" class="qtext" id="q1" autocomplete="off"><span id="hint-q1"></span> of London increased rapidly between 1800 and 1850</li><li>The streets were full of horse-drawn vehicles</li></ul><h4>The proposed solution</h4><ul><li>Charles Pearson, a solicitor, suggested building an underground railway</li><li>Building the railway would make it possible to move people to better housing in the <b class="qnum-inline">2</b><input type="text" class="qtext" id="q2" autocomplete="off"><span id="hint-q2"></span></li><li>A number of <b class="qnum-inline">3</b><input type="text" class="qtext" id="q3" autocomplete="off"><span id="hint-q3"></span> agreed with Pearson’s idea</li><li>The company initially had problems getting the <b class="qnum-inline">4</b><input type="text" class="qtext" id="q4" autocomplete="off"><span id="hint-q4"></span> needed for the project</li><li>Negative articles about the project appeared in the <b class="qnum-inline">5</b><input type="text" class="qtext" id="q5" autocomplete="off"><span id="hint-q5"></span></li></ul><h4>The construction</h4><ul><li>The chosen route did not require many buildings to be pulled down</li><li>The ‘cut and cover’ method was used to construct the tunnels</li><li>With the completion of the brick arch, the tunnel was covered with <b class="qnum-inline">6</b><input type="text" class="qtext" id="q6" autocomplete="off"><span id="hint-q6"></span></li></ul></div></div>
+<div class="qgroup">
+<h3>Questions 7-13</h3>
+<div class="instr">Do the following statements agree with the information given in Reading Passage 1?</div>
+<div class="instr">In boxes 7-13 on your answer sheet, write</div>
+<div class="instr">TRUE if the statement agrees with the information</div>
+<div class="instr">FALSE if the statement contradicts the information</div>
+<div class="instr">NOT GIVEN if there is no information on this</div>
+<div class="qitem"><span class="qnum">7.</span> Other countries had built underground railways before the Metropolitan line opened.<span id="hint-q7"></span><br>
+<label class="opt-row"><input type="radio" name="q7" value="TRUE"> TRUE</label>
+<label class="opt-row"><input type="radio" name="q7" value="FALSE"> FALSE</label>
+<label class="opt-row"><input type="radio" name="q7" value="NOT GIVEN"> NOT GIVEN</label>
+</div>
+<div class="qitem"><span class="qnum">8.</span> More people than predicted travelled on the Metropolitan line on the first day.<span id="hint-q8"></span><br>
+<label class="opt-row"><input type="radio" name="q8" value="TRUE"> TRUE</label>
+<label class="opt-row"><input type="radio" name="q8" value="FALSE"> FALSE</label>
+<label class="opt-row"><input type="radio" name="q8" value="NOT GIVEN"> NOT GIVEN</label>
+</div>
+<div class="qitem"><span class="qnum">9.</span> The use of ventilation shafts failed to prevent pollution in the tunnels.<span id="hint-q9"></span><br>
+<label class="opt-row"><input type="radio" name="q9" value="TRUE"> TRUE</label>
+<label class="opt-row"><input type="radio" name="q9" value="FALSE"> FALSE</label>
+<label class="opt-row"><input type="radio" name="q9" value="NOT GIVEN"> NOT GIVEN</label>
+</div>
+<div class="qitem"><span class="qnum">10.</span> A different approach from the ‘cut and cover’ technique was required in London’s central area.<span id="hint-q10"></span><br>
+<label class="opt-row"><input type="radio" name="q10" value="TRUE"> TRUE</label>
+<label class="opt-row"><input type="radio" name="q10" value="FALSE"> FALSE</label>
+<label class="opt-row"><input type="radio" name="q10" value="NOT GIVEN"> NOT GIVEN</label>
+</div>
+<div class="qitem"><span class="qnum">11.</span> The windows on City &amp; South London trains were at eye level.<span id="hint-q11"></span><br>
+<label class="opt-row"><input type="radio" name="q11" value="TRUE"> TRUE</label>
+<label class="opt-row"><input type="radio" name="q11" value="FALSE"> FALSE</label>
+<label class="opt-row"><input type="radio" name="q11" value="NOT GIVEN"> NOT GIVEN</label>
+</div>
+<div class="qitem"><span class="qnum">12.</span> The City &amp; South London Railway was a financial success.<span id="hint-q12"></span><br>
+<label class="opt-row"><input type="radio" name="q12" value="TRUE"> TRUE</label>
+<label class="opt-row"><input type="radio" name="q12" value="FALSE"> FALSE</label>
+<label class="opt-row"><input type="radio" name="q12" value="NOT GIVEN"> NOT GIVEN</label>
+</div>
+<div class="qitem"><span class="qnum">13.</span> Trains on the ‘Tuppenny Tube’ nearly always ran on time.<span id="hint-q13"></span><br>
+<label class="opt-row"><input type="radio" name="q13" value="TRUE"> TRUE</label>
+<label class="opt-row"><input type="radio" name="q13" value="FALSE"> FALSE</label>
+<label class="opt-row"><input type="radio" name="q13" value="NOT GIVEN"> NOT GIVEN</label>
+</div>
+</div>
+
+<div class="explain-panel" id="explainPanel-0"><h3>📘 Giải thích chi tiết đáp án</h3><div class="explain-item"><b class="eq">Câu 1.</b> Đáp án đúng: <span class="eans">population</span><span class="equote">&ldquo;London's population grew at an astonishing rate, and the central area became increasingly congested&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Paragraph 1 states that London's 'population' grew astonishingly fast in the first half of the 19th century, making the centre congested — this matches the gap 'The ___ of London increased rapidly between 1800 and 1850' → answer 'population'.</span><span class="etext etext-vi"><b class="elang">VI:</b> Đoạn 1 nói dân số ('population') London tăng nhanh chóng trong nửa đầu thế kỷ 19 — khớp với ô 'The ___ of London increased rapidly between 1800 and 1850' → đáp án 'population'.</span></div><div class="explain-item"><b class="eq">Câu 2.</b> Đáp án đúng: <span class="eans">suburbs</span><span class="equote">&ldquo;His idea was to relocate the poor workers who lived in the inner-city slums to newly constructed suburbs&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Paragraph 2 says Pearson's idea was to move poor workers into newly built 'suburbs' — this matches the gap 'move people to better housing in the ___' → answer 'suburbs'.</span><span class="etext etext-vi"><b class="elang">VI:</b> Đoạn 2 nói ý tưởng của Pearson là chuyển người nghèo tới các khu ngoại ô ('suburbs') mới xây — khớp với ô 'move people to better housing in the ___' → đáp án 'suburbs'.</span></div><div class="explain-item"><b class="eq">Câu 3.</b> Đáp án đúng: <span class="eans">businessmen</span><span class="equote">&ldquo;Pearson's ideas gained support amongst some businessmen&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Paragraph 2 states that Pearson's idea won support from some 'businessmen' — this matches the gap 'A number of ___ agreed with Pearson's idea' → answer 'businessmen'.</span><span class="etext etext-vi"><b class="elang">VI:</b> Đoạn 2 nói ý tưởng của Pearson được một số doanh nhân ('businessmen') ủng hộ — khớp với ô 'A number of ___ agreed with Pearson's idea' → đáp án 'businessmen'.</span></div><div class="explain-item"><b class="eq">Câu 4.</b> Đáp án đúng: <span class="eans">funding</span><span class="equote">&ldquo;The organisation had difficulty in raising the funding for such a radical and expensive scheme&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Paragraph 3 says the company had difficulty raising the 'funding' for the scheme — this matches the gap 'the company initially had problems getting the ___ needed for the project' → answer 'funding'.</span><span class="etext etext-vi"><b class="elang">VI:</b> Đoạn 3 nói công ty gặp khó khăn trong việc huy động vốn ('funding') — khớp với ô 'the company initially had problems getting the ___ needed for the project' → đáp án 'funding'.</span></div><div class="explain-item"><b class="eq">Câu 5.</b> Đáp án đúng: <span class="eans">press</span><span class="equote">&ldquo;not least because of the critical articles printed by the press&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Paragraph 3 attributes some of the difficulty to critical articles in 'the press' — this matches the gap 'Negative articles about the project appeared in the ___' → answer 'press'.</span><span class="etext etext-vi"><b class="elang">VI:</b> Đoạn 3 nói khó khăn một phần do các bài báo chỉ trích trên 'the press' (báo chí) — khớp với ô 'Negative articles about the project appeared in the ___' → đáp án 'press'.</span></div><div class="explain-item"><b class="eq">Câu 6.</b> Đáp án đúng: <span class="eans">soil</span><span class="equote">&ldquo;A two-metre-deep layer of soil was laid on top of the tunnel&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Paragraph 4 says that after the brick arch was built, a two-metre layer of 'soil' was placed on top of the tunnel — this matches the gap 'the tunnel was covered with ___' → answer 'soil'.</span><span class="etext etext-vi"><b class="elang">VI:</b> Đoạn 4 nói sau khi xây vòm gạch, một lớp đất ('soil') dày 2m được phủ lên trên đường hầm — khớp với ô 'the tunnel was covered with ___' → đáp án 'soil'.</span></div><div class="explain-item"><b class="eq">Câu 7.</b> Đáp án đúng: <span class="eans">FALSE</span><span class="equote">&ldquo;The Metropolitan line, which opened on 10 January 1863, was the world's first underground railway&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Question 7 claims other countries built underground railways BEFORE the Metropolitan line. Paragraph 5 states the Metropolitan line was the world's FIRST underground railway — this directly contradicts the statement → answer FALSE.</span><span class="etext etext-vi"><b class="elang">VI:</b> Câu hỏi 7 nói các nước khác đã xây đường sắt ngầm TRƯỚC tuyến Metropolitan. Đoạn 5 khẳng định tuyến Metropolitan là đường sắt ngầm ĐẦU TIÊN trên thế giới — trái ngược với câu hỏi → đáp án FALSE.</span></div><div class="explain-item"><b class="eq">Câu 8.</b> Đáp án đúng: <span class="eans">NOT GIVEN</span><span class="equote">&ldquo;On its first day, almost 40,000 passengers were carried between Paddington and Farringdon&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Question 8 claims first-day passenger numbers exceeded predictions. The passage only gives the actual figure (almost 40,000) with no mention of any PREDICTED figure to compare it against → answer NOT GIVEN.</span><span class="etext etext-vi"><b class="elang">VI:</b> Câu hỏi 8 nói lượng khách ngày đầu tiên vượt dự đoán. Bài chỉ nêu con số thực tế (gần 40.000 khách) mà không hề nói đến con số DỰ ĐOÁN trước đó để so sánh → đáp án NOT GIVEN.</span></div><div class="explain-item"><b class="eq">Câu 9.</b> Đáp án đúng: <span class="eans">TRUE</span><span class="equote">&ldquo;smoke and fumes remained a problem, even though ventilation shafts were added to the tunnels&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Paragraph 6 says that even though 'ventilation shafts' were added, smoke and fumes STILL remained a problem — this matches the statement 'The use of ventilation shafts failed to prevent pollution' → answer TRUE.</span><span class="etext etext-vi"><b class="elang">VI:</b> Đoạn 6 nói dù đã thêm giếng thông gió ('ventilation shafts'), khói và khí thải VẪN CÒN là vấn đề — khớp với câu hỏi 'The use of ventilation shafts failed to prevent pollution' → đáp án TRUE.</span></div><div class="explain-item"><b class="eq">Câu 10.</b> Đáp án đúng: <span class="eans">TRUE</span><span class="equote">&ldquo;The 'cut and cover' method of construction was not an option in this part of the capital. The only alternative was to tunnel deep underground&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Paragraph 7 says the 'cut and cover' method could not be used in this part of the city, so a different method (deep tunnelling) was needed — this matches 'A different approach from the cut and cover technique was required' → answer TRUE.</span><span class="etext etext-vi"><b class="elang">VI:</b> Đoạn 7 nói phương pháp 'cut and cover' không thể áp dụng ở khu trung tâm, cần một cách khác (đào hầm sâu) — khớp với câu hỏi 'A different approach from the cut and cover technique was required' → đáp án TRUE.</span></div><div class="explain-item"><b class="eq">Câu 11.</b> Đáp án đúng: <span class="eans">FALSE</span><span class="equote">&ldquo;The carriages were narrow and had tiny windows just below the roof&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Question 11 claims the City &amp; South London Railway's windows were at eye level. Paragraph 8 says the tiny windows were located just below the ROOF (very high up, not at eye level) — this contradicts the statement → answer FALSE.</span><span class="etext etext-vi"><b class="elang">VI:</b> Câu hỏi 11 nói cửa sổ tàu City &amp; South London ngang tầm mắt. Đoạn 8 lại nói cửa sổ nhỏ nằm SÁT MÁI toa (rất cao, không phải tầm mắt) — trái ngược → đáp án FALSE.</span></div><div class="explain-item"><b class="eq">Câu 12.</b> Đáp án đúng: <span class="eans">FALSE</span><span class="equote">&ldquo;Although the City &amp; South London Railway was a great technical achievement, it did not make a profit&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Question 12 claims the City &amp; South London line was a financial success. The passage explicitly states it did NOT make a profit, despite being a technical achievement — this contradicts the statement → answer FALSE.</span><span class="etext etext-vi"><b class="elang">VI:</b> Câu hỏi 12 nói tuyến City &amp; South London thành công về tài chính. Bài lại nói rõ tuyến này KHÔNG sinh lời ('did not make a profit') dù thành công về kỹ thuật — trái ngược → đáp án FALSE.</span></div><div class="explain-item"><b class="eq">Câu 13.</b> Đáp án đúng: <span class="eans">NOT GIVEN</span><span class="equote">&ldquo;the Central London Railway, known as the 'Tuppenny Tube', began operation using new electric locomotives. It was very popular&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Question 13 claims the 'Tuppenny Tube' was almost always on time. The passage only says the line was 'very popular'; it never mentions punctuality at all → answer NOT GIVEN.</span><span class="etext etext-vi"><b class="elang">VI:</b> Câu hỏi 13 nói tàu 'Tuppenny Tube' hầu như luôn đúng giờ. Bài chỉ nói tuyến này rất được ưa chuộng ('very popular'), không hề đề cập đến việc tàu có đúng giờ hay không → đáp án NOT GIVEN.</span></div></div>
+  </div>
+  <div class="passage-panel tab-content" id="passage-1">
+<div class="passage-title">Forest management in Pennsylvania, USA</div>
+<div class="passage-instr">You should spend about 20 minutes on Questions 14-26, which are based on Reading Passage 2 below.</div>
+<p style="font-style:italic;">How managing low-quality wood (also known as low-use wood) for bioenergy can encourage sustainable forest management</p>
+<p><span class="subheading">A </span>A tree’s ‘value’ depends on several factors including its species, size, form, condition, quality, function, and accessibility, and depends on the management goals for a given forest. The same tree can be valued very differently by each person who looks at it. A large, straight black cherry tree has high value as timber to be cut into logs or made into furniture, but for a landowner more interested in wildlife habitat, the real value of that stem (or trunk) may be the food it provides to animals. Likewise, if the tree suffers from black knot disease, its value for timber decreases, but to a woodworker interested in making bowls, it brings an opportunity for a unique and beautiful piece of art.</p>
+<p><span class="subheading">B </span>In the past, Pennsylvania landowners were solely interested in the value of their trees as high-quality timber. The norm was to remove the stems of highest quality and leave behind poorly formed trees that were not as well suited to the site where they grew. This practice, called ‘high-grading’, has left a legacy of ‘low-use wood’ in the forests. Some people even call these ‘junk trees’, and they are abundant in Pennsylvania. These trees have lower economic value for traditional timber markets, compete for growth with higher-value trees, shade out desirable regeneration and decrease the health of a stand* leaving it more vulnerable to poor weather and disease. Management that specifically targets low-use wood can help landowners manage these forest health issues, and wood energy markets help promote this.</p>
+<p><span class="subheading">C </span>Wood energy markets can accept less expensive wood material of lower quality than would be suitable for traditional timber markets. Most wood used for energy in Pennsylvania is used to produce heat or electricity through combustion. Many schools and hospitals use wood boiler systems to heat and power their facilities, many homes are primarily heated with wood, and some coal plants incorporate wood into their coal streams to produce electricity. Wood can also be gasified for electrical generation and can even be made into liquid fuels like ethanol and gasoline for lorries and cars. All these products are made primarily from low-use wood. Several tree- and plant-cutting approaches, which could greatly improve the long-term quality of a forest, focus strongly or solely on the use of wood for those markets.</p>
+<p><span class="subheading">D </span>One such approach is called a Timber Stand Improvement (TSI) Cut. In a TSI Cut, really poor-quality tree and plant material is cut down to allow more space, light, and other resources to the highest-valued stems that remain. Removing invasive plants might be another primary goal of a TSI Cut. The stems that are left behind might then grow in size and develop more foliage and larger crowns or tops that produce more coverage for wildlife; they have a better chance to regenerate in a less crowded environment. TSI Cuts can be tailored to one farmer’s specific management goals for his or her land.</p>
+<p><span class="subheading">E </span>Another approach that might yield a high amount of low-use wood is a Salvage Cut. With the many pests and pathogens visiting forests including hemlock wooly adelgid, Asian longhorned beetle, emerald ash borer, and gypsy moth, to name just a few, it is important to remember that those working in the forests can help ease these issues through cutting procedures. These types of cut reduce the number of sick trees and seek to manage the future spread of a pest problem. They leave vigorous trees that have stayed healthy enough to survive the outbreak.</p>
+<p><span class="subheading">F </span>A Shelterwood Cut, which only takes place in a mature forest that has already been thinned several times, involves removing all the mature trees when other seedlings have become established. This then allows the forester to decide which tree species are regenerated. It leaves a young forest where all trees are at a similar point in their growth. It can also be used to develop a two-tier forest so that there are two harvests and the money that comes in is spread out over a decade or more.</p>
+<p><span class="subheading">G </span>Thinnings and dense and dead wood removal for fire prevention also center on the production of low-use wood. However, it is important to remember that some retention of what many would classify as low-use wood is very important. The tops of trees that have been cut down should be left on the site so that their nutrients cycle back into the soil. In addition, trees with many cavities are extremely important habitats for insect predators like woodpeckers, bats and small mammals. They help control problem insects and increase the health and resilience of the forest. It is also important to remember that not all small trees are low-use. For example, many species like hawthorn provide food for wildlife. Finally, rare species of trees in a forest should also stay behind as they add to its structural diversity.</p>
+<p class="footnote">* Stand - An area covered with trees that have common features (e.g. size)</p>
+
+  </div>
+  <div class="question-panel tab-content" id="questions-1">
+<div class="qgroup">
+<h3>Questions 14-18</h3>
+<div class="instr">Reading Passage 2 has seven paragraphs, A-G.</div>
+<div class="instr">Which paragraph contains the following information?</div>
+<div class="instr">Write the correct letter, A-G, in boxes 14—18 on your answer sheet.</div>
+<div class="instr">NB You may use any letter more than once.</div>
+<div class="qitem"><span class="qnum">14.</span> bad outcomes for a forest when people focus only on its financial reward <select class="qselect" id="q14"><option value="">-- chọn --</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option><option value="G">G</option></select></div>
+<div class="qitem"><span class="qnum">15.</span> reference to the aspects of any tree that contribute to its worth <select class="qselect" id="q15"><option value="">-- chọn --</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option><option value="G">G</option></select></div>
+<div class="qitem"><span class="qnum">16.</span> mention of the potential use of wood to help run vehicles <select class="qselect" id="q16"><option value="">-- chọn --</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option><option value="G">G</option></select></div>
+<div class="qitem"><span class="qnum">17.</span> examples of insects that attack trees <select class="qselect" id="q17"><option value="">-- chọn --</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option><option value="G">G</option></select></div>
+<div class="qitem"><span class="qnum">18.</span> an alternative name for trees that produce low-use wood <select class="qselect" id="q18"><option value="">-- chọn --</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option><option value="G">G</option></select></div>
+</div>
+<div class="qgroup">
+<h3>Questions 19-21</h3>
+<div class="instr">Look at the following purposes (Questions 19-21) and the list of timber cuts below.</div>
+<div class="instr">Match each purpose with the correct timber cut, A, B or C.</div>
+<div class="instr">Write the correct letter, A, B or C, in boxes 19-21 on your answer sheet.</div>
+<div class="instr">NB You may use any letter more than once.</div>
+<div class="keylist"><b>List of Timber Cuts</b>
+<div>A  a TSI Cut</div>
+<div>B  a Salvage Cut</div>
+<div>C  a Shelterwood Cut</div>
+</div>
+<div class="qitem"><span class="qnum">19.</span> to remove trees that are diseased <select class="qselect" id="q19"><option value="">-- chọn --</option><option value="A">a TSI Cut</option><option value="B">a Salvage Cut</option><option value="C">a Shelterwood Cut</option></select></div>
+<div class="qitem"><span class="qnum">20.</span> to generate income across a number of years <select class="qselect" id="q20"><option value="">-- chọn --</option><option value="A">a TSI Cut</option><option value="B">a Salvage Cut</option><option value="C">a Shelterwood Cut</option></select></div>
+<div class="qitem"><span class="qnum">21.</span> to create a forest whose trees are close in age <select class="qselect" id="q21"><option value="">-- chọn --</option><option value="A">a TSI Cut</option><option value="B">a Salvage Cut</option><option value="C">a Shelterwood Cut</option></select></div>
+</div>
+<div class="qgroup">
+<h3>Questions 22-26</h3>
+<div class="instr">Complete the sentences below.</div>
+<div class="instr">Choose ONE WORD ONLY from the passage for each answer.</div>
+<div class="instr">Write your answers in boxes 22-26 on your answer sheet.</div>
+<div class="qitem"><span class="qnum">22.</span> Some dead wood is removed to avoid the possibility of <input type="text" class="qtext" id="q22" autocomplete="off"><span id="hint-q22"></span></div>
+<div class="qitem"><span class="qnum">23.</span> The <input type="text" class="qtext" id="q23" autocomplete="off"> from the tops of cut trees can help improve soil quality.<span id="hint-q23"></span></div>
+<div class="qitem"><span class="qnum">24.</span> Some damaged trees should be left, as their <input type="text" class="qtext" id="q24" autocomplete="off"> provide habitats for a range of creatures.<span id="hint-q24"></span></div>
+<div class="qitem"><span class="qnum">25.</span> Some trees that are small, such as <input type="text" class="qtext" id="q25" autocomplete="off"> are a source of food for animals and insects.<span id="hint-q25"></span></div>
+<div class="qitem"><span class="qnum">26.</span> Any trees that are <input type="text" class="qtext" id="q26" autocomplete="off"> should be left to grow, as they add to the variety of species in the forest.<span id="hint-q26"></span></div>
+</div>
+
+<div class="explain-panel" id="explainPanel-1"><h3>📘 Giải thích chi tiết đáp án</h3><div class="explain-item"><b class="eq">Câu 14.</b> Đáp án đúng: <span class="eans">B</span><span class="equote">&ldquo;This practice, called 'high-grading', has left a legacy of 'low-use wood' in the forests... compete for growth with higher-value trees, shade out desirable regeneration and decrease the health of a stand&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Paragraph B describes the negative outcomes (low-quality trees crowding out better ones, reducing overall forest health) that result when landowners focus solely on a tree's financial value — this matches 'bad outcomes for a forest when people focus only on its financial reward' → answer paragraph B.</span><span class="etext etext-vi"><b class="elang">VI:</b> Đoạn B mô tả hậu quả xấu (cây kém chất lượng lấn át, giảm sức khỏe khu rừng) khi chủ đất chỉ quan tâm giá trị tài chính của cây — khớp với câu hỏi 'bad outcomes for a forest when people focus only on its financial reward' → đáp án đoạn B.</span></div><div class="explain-item"><b class="eq">Câu 15.</b> Đáp án đúng: <span class="eans">A</span><span class="equote">&ldquo;A tree's 'value' depends on several factors including its species, size, form, condition, quality, function, and accessibility&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Paragraph A lists the factors that determine a tree's 'value' — this matches 'reference to the aspects of any tree that contribute to its worth' → answer paragraph A.</span><span class="etext etext-vi"><b class="elang">VI:</b> Đoạn A liệt kê các yếu tố quyết định 'giá trị' của một cái cây — khớp với câu hỏi 'reference to the aspects of any tree that contribute to its worth' → đáp án đoạn A.</span></div><div class="explain-item"><b class="eq">Câu 16.</b> Đáp án đúng: <span class="eans">C</span><span class="equote">&ldquo;can even be made into liquid fuels like ethanol and gasoline for lorries and cars&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Paragraph C says wood can be processed into liquid fuels such as ethanol and petrol for vehicles — this matches 'mention of the potential use of wood to help run vehicles' → answer paragraph C.</span><span class="etext etext-vi"><b class="elang">VI:</b> Đoạn C nói gỗ có thể chế biến thành nhiên liệu lỏng như ethanol, xăng cho xe cộ — khớp với câu hỏi 'mention of the potential use of wood to help run vehicles' → đáp án đoạn C.</span></div><div class="explain-item"><b class="eq">Câu 17.</b> Đáp án đúng: <span class="eans">E</span><span class="equote">&ldquo;the many pests and pathogens visiting forests including hemlock wooly adelgid, Asian longhorned beetle, emerald ash borer, and gypsy moth&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Paragraph E names specific insect species that damage forests — this matches 'examples of insects that attack trees' → answer paragraph E.</span><span class="etext etext-vi"><b class="elang">VI:</b> Đoạn E liệt kê tên các loài côn trùng gây hại cho rừng — khớp với câu hỏi 'examples of insects that attack trees' → đáp án đoạn E.</span></div><div class="explain-item"><b class="eq">Câu 18.</b> Đáp án đúng: <span class="eans">B</span><span class="equote">&ldquo;Some people even call these 'junk trees', and they are abundant in Pennsylvania&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Paragraph B says these low-value trees are also called 'junk trees' — this matches 'an alternative name for trees that produce low-use wood' → answer paragraph B.</span><span class="etext etext-vi"><b class="elang">VI:</b> Đoạn B nói người ta còn gọi các cây gỗ ít giá trị này là 'junk trees' (cây rác/cây vô dụng) — khớp với câu hỏi 'an alternative name for trees that produce low-use wood' → đáp án đoạn B.</span></div><div class="explain-item"><b class="eq">Câu 19.</b> Đáp án đúng: <span class="eans">B</span><span class="equote">&ldquo;These types of cut reduce the number of sick trees and seek to manage the future spread of a pest problem&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Paragraph E describes the Salvage Cut as removing diseased trees and controlling pest spread — this matches the purpose 'to remove trees that are diseased' → answer B (a Salvage Cut).</span><span class="etext etext-vi"><b class="elang">VI:</b> Đoạn E mô tả Salvage Cut nhằm loại bỏ cây bệnh, kiểm soát sâu bệnh lây lan — khớp với mục đích 'to remove trees that are diseased' → đáp án B (a Salvage Cut).</span></div><div class="explain-item"><b class="eq">Câu 20.</b> Đáp án đúng: <span class="eans">C</span><span class="equote">&ldquo;It can also be used to develop a two-tier forest so that there are two harvests and the money that comes in is spread out over a decade or more&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Paragraph F says the Shelterwood Cut can produce two separate harvests, spreading income over many years — this matches the purpose 'to generate income across a number of years' → answer C (a Shelterwood Cut).</span><span class="etext etext-vi"><b class="elang">VI:</b> Đoạn F mô tả Shelterwood Cut có thể tạo ra 2 đợt thu hoạch, giúp có thu nhập trải dài qua nhiều năm — khớp với mục đích 'to generate income across a number of years' → đáp án C (a Shelterwood Cut).</span></div><div class="explain-item"><b class="eq">Câu 21.</b> Đáp án đúng: <span class="eans">C</span><span class="equote">&ldquo;It leaves a young forest where all trees are at a similar point in their growth&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Paragraph F says the Shelterwood Cut leaves behind a young forest whose trees are at a similar stage of growth — this matches the purpose 'to create a forest whose trees are close in age' → answer C (a Shelterwood Cut).</span><span class="etext etext-vi"><b class="elang">VI:</b> Đoạn F nói Shelterwood Cut để lại một khu rừng non với các cây có độ tuổi/giai đoạn phát triển tương đồng — khớp với mục đích 'to create a forest whose trees are close in age' → đáp án C (a Shelterwood Cut).</span></div><div class="explain-item"><b class="eq">Câu 22.</b> Đáp án đúng: <span class="eans">fire</span><span class="equote">&ldquo;Thinnings and dense and dead wood removal for fire prevention also center on the production of low-use wood&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Paragraph G says dead/dense wood is removed to prevent 'fire' — this matches the gap 'Some dead wood is removed to avoid the possibility of ___' → answer 'fire'.</span><span class="etext etext-vi"><b class="elang">VI:</b> Đoạn G nói việc loại bỏ gỗ chết/dày đặc là để phòng ngừa 'fire' (cháy rừng) — khớp với câu 'Some dead wood is removed to avoid the possibility of ___' → đáp án 'fire'.</span></div><div class="explain-item"><b class="eq">Câu 23.</b> Đáp án đúng: <span class="eans">nutrients</span><span class="equote">&ldquo;The tops of trees that have been cut down should be left on the site so that their nutrients cycle back into the soil&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Paragraph G says the tops of felled trees should be left on site so their 'nutrients' return to the soil — this matches the gap 'The ___ from the tops of cut trees can help improve soil quality' → answer 'nutrients'.</span><span class="etext etext-vi"><b class="elang">VI:</b> Đoạn G nói phần ngọn cây bị chặt nên để lại tại chỗ để 'nutrients' (dưỡng chất) quay trở lại đất — khớp với câu 'The ___ from the tops of cut trees can help improve soil quality' → đáp án 'nutrients'.</span></div><div class="explain-item"><b class="eq">Câu 24.</b> Đáp án đúng: <span class="eans">cavities</span><span class="equote">&ldquo;trees with many cavities are extremely important habitats for insect predators like woodpeckers, bats and small mammals&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Paragraph G says trees with many hollow 'cavities' are important habitats for insect-eating species — this matches the gap 'Some damaged trees should be left, as their ___ provide habitats' → answer 'cavities'.</span><span class="etext etext-vi"><b class="elang">VI:</b> Đoạn G nói những cây có nhiều hốc rỗng ('cavities') là môi trường sống quan trọng cho các loài ăn côn trùng — khớp với câu 'Some damaged trees should be left, as their ___ provide habitats' → đáp án 'cavities'.</span></div><div class="explain-item"><b class="eq">Câu 25.</b> Đáp án đúng: <span class="eans">hawthorn</span><span class="equote">&ldquo;not all small trees are low-use. For example, many species like hawthorn provide food for wildlife&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Paragraph G gives 'hawthorn' as an example of a small tree that is nonetheless useful because it provides food for wildlife — this matches the gap 'Some trees that are small, such as ___, are a source of food for animals' → answer 'hawthorn'.</span><span class="etext etext-vi"><b class="elang">VI:</b> Đoạn G nêu ví dụ cây 'hawthorn' (táo gai) — cây nhỏ nhưng vẫn có ích vì cung cấp thức ăn cho động vật hoang dã — khớp với câu 'Some trees that are small, such as ___, are a source of food for animals' → đáp án 'hawthorn'.</span></div><div class="explain-item"><b class="eq">Câu 26.</b> Đáp án đúng: <span class="eans">rare</span><span class="equote">&ldquo;rare species of trees in a forest should also stay behind as they add to its structural diversity&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Paragraph G says 'rare' tree species should be left standing because they add to structural diversity — this matches the gap 'Any trees that are ___ should be left to grow, as they add to the variety of species' → answer 'rare'.</span><span class="etext etext-vi"><b class="elang">VI:</b> Đoạn G nói các loài cây HIẾM ('rare') nên được giữ lại vì góp phần đa dạng cấu trúc rừng — khớp với câu 'Any trees that are ___ should be left to grow, as they add to the variety of species' → đáp án 'rare'.</span></div></div>
+  </div>
+  <div class="passage-panel tab-content" id="passage-2">
+<div class="passage-title">Why companies should welcome disorder</div>
+<div class="passage-instr">You should spend about 20 minutes on Questions 27–40, which are based on Reading Passage 3.</div>
+<p><span class="subheading">A </span>Organisation is big business. Whether it is of our lives – all those inboxes and calendars – or how companies are structured, a multi-billion dollar industry helps to meet this need. We have more strategies for time management, project management and self-organisation than at any other time in human history. We are told that we ought to organise our company, our home life, our week, our day and even our sleep, all as a means to becoming more productive. Every week, countless seminars and workshops take place around the world to tell a paying public that they ought to structure their lives in order to achieve this. This rhetoric has also crept into the thinking of business leaders and entrepreneurs, much to the delight of self-proclaimed perfectionists with the need to get everything right. The number of business schools and graduates has massively increased over the past 50 years, essentially teaching people how to organise well.</p>
+<p><span class="subheading">B </span>Ironically, however, the number of businesses that fail has also steadily increased. Work-related stress has increased. A large proportion of workers from all demographics claim to be dissatisfied with the way their work is structured and the way they are managed. This begs the question: what has gone wrong? Why is it that on paper the drive for organisation seems a sure shot for increasing productivity, but in reality falls well short of what is expected?</p>
+<p><span class="subheading">C </span>This has been a problem for a while now. Frederick Taylor was one of the forefathers of scientific management. Writing in the first half of the 20th century, he designed a number of principles to improve the efficiency of the work process, which have since become widespread in modern companies. So the approach has been around for a while.</p>
+<p><span class="subheading">D </span>New research suggests that this obsession with efficiency is misguided. The problem is not necessarily the management theories or strategies we use to organise our work; it's the basic assumptions we hold in approaching how we work. Here it's the assumption that order is a necessary condition for productivity. This assumption has also fostered the idea that disorder must be detrimental to organisational productivity. The result is that businesses and people spend time and money organising themselves for the sake of organising, rather than actually looking at the end goal and usefulness of such an effort.</p>
+<p><span class="subheading">E </span>What's more, recent studies show that order actually has diminishing returns. Order does increase productivity to a certain extent, but eventually the usefulness of the process of organisation, and the benefit it yields, reduce until the point where any further increase in order reduces productivity. Some argue that in a business, if the cost of formally structuring something outweighs the benefit of doing it, then that thing ought not to be formally structured. Instead, the resources involved can be better used elsewhere.</p>
+<p><span class="subheading">F </span>In fact, research shows that, when innovating, the best approach is to create an environment devoid of structure and hierarchy and enable everyone involved to engage as one organic group. These environments can lead to new solutions that, under conventionally structured environments (filled with bottlenecks in terms of information flow, power structures, rules, and routines) would never be reached.</p>
+<p><span class="subheading">G </span>In recent times companies have slowly started to embrace this disorganisation. Many of them embrace it in terms of perception (embracing the idea of disorder, as opposed to fearing it) and in terms of process (putting mechanisms in place to reduce structure). For example, Oticon, a large Danish manufacturer of hearing aids, used what it called a 'spaghetti' structure in order to reduce the organisation's rigid hierarchies. This involved scrapping formal job titles and giving staff huge amounts of ownership over their own time and projects. This approach proved to be highly successful initially, with clear improvements in worker productivity in all facets of the business. In similar fashion, the former chairman of General Electric embraced disorganisation, putting forward the idea of the 'boundaryless' organisation. Again, it involves breaking down the barriers between different parts of a company and encouraging virtual collaboration and flexible working. Google and a number of other tech companies have embraced (at least in part) these kinds of flexible structures, facilitated by technology and strong company values which glue people together.</p>
+<p><span class="subheading">H </span>A word of warning to others thinking of jumping on this bandwagon: the evidence so far suggests disorder, much like order, also seems to have diminishing utility, and can also have detrimental effects on performance if overused. Like order, disorder should be embraced only so far as it is useful. But we should not fear it – nor venerate one over the other. This research also shows that we should continually question whether or not our existing assumptions work.</p>
+
+  </div>
+  <div class="question-panel tab-content" id="questions-2">
+<div class="qgroup">
+<h3>Questions 27–34</h3>
+<div class="instr">Reading Passage 3 has eight sections, A–H.</div>
+<div class="instr">Choose the correct heading for each section from the list of headings below.</div>
+<div class="instr">Write the correct number, i–ix, in boxes 27–34 on your answer sheet.</div>
+<div class="headinglist"><b>List of Headings</b><br>
+<div>i.  Complaints about the impact of a certain approach</div>
+<div>ii.  Fundamental beliefs that are in fact incorrect</div>
+<div>iii.  Early recommendations concerning business activities</div>
+<div>iv.  Organisations that put a new approach into practice</div>
+<div>v.  Companies that have suffered from changing their approach</div>
+<div>vi.  What people are increasingly expected to do</div>
+<div>vii.  How to achieve outcomes that are currently impossible</div>
+<div>viii.  Neither approach guarantees continuous improvement</div>
+<div>ix.  Evidence that a certain approach can have more disadvantages than advantages</div>
+</div>
+<div class="qitem"><span class="qnum">27.</span> Section A <select class="qselect" id="q27"><option value="">-- chọn --</option><option value="i">Complaints about the impact of a certain approach</option><option value="ii">Fundamental beliefs that are in fact incorrect</option><option value="iii">Early recommendations concerning business activities</option><option value="iv">Organisations that put a new approach into practice</option><option value="v">Companies that have suffered from changing their approach</option><option value="vi">What people are increasingly expected to do</option><option value="vii">How to achieve outcomes that are currently impossible</option><option value="viii">Neither approach guarantees continuous improvement</option><option value="ix">Evidence that a certain approach can have more disadvantages than advantages</option></select></div>
+<div class="qitem"><span class="qnum">28.</span> Section B <select class="qselect" id="q28"><option value="">-- chọn --</option><option value="i">Complaints about the impact of a certain approach</option><option value="ii">Fundamental beliefs that are in fact incorrect</option><option value="iii">Early recommendations concerning business activities</option><option value="iv">Organisations that put a new approach into practice</option><option value="v">Companies that have suffered from changing their approach</option><option value="vi">What people are increasingly expected to do</option><option value="vii">How to achieve outcomes that are currently impossible</option><option value="viii">Neither approach guarantees continuous improvement</option><option value="ix">Evidence that a certain approach can have more disadvantages than advantages</option></select></div>
+<div class="qitem"><span class="qnum">29.</span> Section C <select class="qselect" id="q29"><option value="">-- chọn --</option><option value="i">Complaints about the impact of a certain approach</option><option value="ii">Fundamental beliefs that are in fact incorrect</option><option value="iii">Early recommendations concerning business activities</option><option value="iv">Organisations that put a new approach into practice</option><option value="v">Companies that have suffered from changing their approach</option><option value="vi">What people are increasingly expected to do</option><option value="vii">How to achieve outcomes that are currently impossible</option><option value="viii">Neither approach guarantees continuous improvement</option><option value="ix">Evidence that a certain approach can have more disadvantages than advantages</option></select></div>
+<div class="qitem"><span class="qnum">30.</span> Section D <select class="qselect" id="q30"><option value="">-- chọn --</option><option value="i">Complaints about the impact of a certain approach</option><option value="ii">Fundamental beliefs that are in fact incorrect</option><option value="iii">Early recommendations concerning business activities</option><option value="iv">Organisations that put a new approach into practice</option><option value="v">Companies that have suffered from changing their approach</option><option value="vi">What people are increasingly expected to do</option><option value="vii">How to achieve outcomes that are currently impossible</option><option value="viii">Neither approach guarantees continuous improvement</option><option value="ix">Evidence that a certain approach can have more disadvantages than advantages</option></select></div>
+<div class="qitem"><span class="qnum">31.</span> Section E <select class="qselect" id="q31"><option value="">-- chọn --</option><option value="i">Complaints about the impact of a certain approach</option><option value="ii">Fundamental beliefs that are in fact incorrect</option><option value="iii">Early recommendations concerning business activities</option><option value="iv">Organisations that put a new approach into practice</option><option value="v">Companies that have suffered from changing their approach</option><option value="vi">What people are increasingly expected to do</option><option value="vii">How to achieve outcomes that are currently impossible</option><option value="viii">Neither approach guarantees continuous improvement</option><option value="ix">Evidence that a certain approach can have more disadvantages than advantages</option></select></div>
+<div class="qitem"><span class="qnum">32.</span> Section F <select class="qselect" id="q32"><option value="">-- chọn --</option><option value="i">Complaints about the impact of a certain approach</option><option value="ii">Fundamental beliefs that are in fact incorrect</option><option value="iii">Early recommendations concerning business activities</option><option value="iv">Organisations that put a new approach into practice</option><option value="v">Companies that have suffered from changing their approach</option><option value="vi">What people are increasingly expected to do</option><option value="vii">How to achieve outcomes that are currently impossible</option><option value="viii">Neither approach guarantees continuous improvement</option><option value="ix">Evidence that a certain approach can have more disadvantages than advantages</option></select></div>
+<div class="qitem"><span class="qnum">33.</span> Section G <select class="qselect" id="q33"><option value="">-- chọn --</option><option value="i">Complaints about the impact of a certain approach</option><option value="ii">Fundamental beliefs that are in fact incorrect</option><option value="iii">Early recommendations concerning business activities</option><option value="iv">Organisations that put a new approach into practice</option><option value="v">Companies that have suffered from changing their approach</option><option value="vi">What people are increasingly expected to do</option><option value="vii">How to achieve outcomes that are currently impossible</option><option value="viii">Neither approach guarantees continuous improvement</option><option value="ix">Evidence that a certain approach can have more disadvantages than advantages</option></select></div>
+<div class="qitem"><span class="qnum">34.</span> Section H <select class="qselect" id="q34"><option value="">-- chọn --</option><option value="i">Complaints about the impact of a certain approach</option><option value="ii">Fundamental beliefs that are in fact incorrect</option><option value="iii">Early recommendations concerning business activities</option><option value="iv">Organisations that put a new approach into practice</option><option value="v">Companies that have suffered from changing their approach</option><option value="vi">What people are increasingly expected to do</option><option value="vii">How to achieve outcomes that are currently impossible</option><option value="viii">Neither approach guarantees continuous improvement</option><option value="ix">Evidence that a certain approach can have more disadvantages than advantages</option></select></div>
+</div>
+<div class="qgroup">
+<h3>Questions 35–37</h3>
+<div class="instr">Complete the sentences below.</div>
+<div class="instr">Choose ONE WORD ONLY from the passage for each answer.</div>
+<div class="instr">Write your answers in boxes 35–37 on your answer sheet.</div>
+<div class="qitem"><span class="qnum">35.</span> Numerous training sessions are aimed at people who feel they are not <input type="text" class="qtext" id="q35" autocomplete="off"> enough.<span id="hint-q35"></span></div>
+<div class="qitem"><span class="qnum">36.</span> Being organised appeals to people who regard themselves as <input type="text" class="qtext" id="q36" autocomplete="off"> .<span id="hint-q36"></span></div>
+<div class="qitem"><span class="qnum">37.</span> Many people feel <input type="text" class="qtext" id="q37" autocomplete="off"> with aspects of their work.<span id="hint-q37"></span></div>
+</div>
+<div class="qgroup">
+<h3>Questions 38-40</h3>
+<div class="instr">Do the following statements agree with the information given in Reading Passage 3?</div>
+<div class="instr">In boxes 38-40 on your answer sheet, write</div>
+<div class="instr">TRUE if the statement agrees with the information</div>
+<div class="instr">FALSE if the statement contradicts the information</div>
+<div class="instr">NOT GIVEN if there is no information on this</div>
+<div class="qitem"><span class="qnum">38.</span> Both businesses and people aim at order without really considering its value.<span id="hint-q38"></span><br>
+<label class="opt-row"><input type="radio" name="q38" value="TRUE"> TRUE</label>
+<label class="opt-row"><input type="radio" name="q38" value="FALSE"> FALSE</label>
+<label class="opt-row"><input type="radio" name="q38" value="NOT GIVEN"> NOT GIVEN</label>
+</div>
+<div class="qitem"><span class="qnum">39.</span> Innovation is most successful if the people involved have distinct roles.<span id="hint-q39"></span><br>
+<label class="opt-row"><input type="radio" name="q39" value="TRUE"> TRUE</label>
+<label class="opt-row"><input type="radio" name="q39" value="FALSE"> FALSE</label>
+<label class="opt-row"><input type="radio" name="q39" value="NOT GIVEN"> NOT GIVEN</label>
+</div>
+<div class="qitem"><span class="qnum">40.</span> Google was inspired to adopt flexibility by the success of General Electric.<span id="hint-q40"></span><br>
+<label class="opt-row"><input type="radio" name="q40" value="TRUE"> TRUE</label>
+<label class="opt-row"><input type="radio" name="q40" value="FALSE"> FALSE</label>
+<label class="opt-row"><input type="radio" name="q40" value="NOT GIVEN"> NOT GIVEN</label>
+</div>
+</div>
+
+<div class="explain-panel" id="explainPanel-2"><h3>📘 Giải thích chi tiết đáp án</h3><div class="explain-item"><b class="eq">Câu 27.</b> Đáp án đúng: <span class="eans">vi</span><span class="equote">&ldquo;We have more strategies for time management, project management and self-organisation than at any other time in human history... a means to becoming more productive&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Paragraph A describes the growing trend of people and businesses being EXPECTED to organise and structure their work more than ever before — this matches heading vi 'What people are increasingly expected to do'.</span><span class="etext etext-vi"><b class="elang">VI:</b> Đoạn A mô tả xu hướng ngày càng nhiều người/doanh nghiệp được KỲ VỌNG phải tổ chức, sắp xếp công việc gọn gàng — khớp với heading vi 'What people are increasingly expected to do'.</span></div><div class="explain-item"><b class="eq">Câu 28.</b> Đáp án đúng: <span class="eans">i</span><span class="equote">&ldquo;Ironically, however, the number of businesses that fail has also steadily increased. Work-related stress has increased. A large proportion of workers... claim to be dissatisfied&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Paragraph B lists NEGATIVE CONSEQUENCES (business failure, stress, dissatisfaction) of the traditional approach to organising work — this matches heading i 'Complaints about the impact of a certain approach'.</span><span class="etext etext-vi"><b class="elang">VI:</b> Đoạn B nêu các HẬU QUẢ TIÊU CỰC (doanh nghiệp thất bại, stress, bất mãn) của cách tiếp cận tổ chức công việc theo lối cũ — khớp với heading i 'Complaints about the impact of a certain approach'.</span></div><div class="explain-item"><b class="eq">Câu 29.</b> Đáp án đúng: <span class="eans">iii</span><span class="equote">&ldquo;Frederick Taylor was one of the forefathers of scientific management. Writing in the first half of the 20th century, he designed a number of principles&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Paragraph C discusses Frederick Taylor and his scientific-management principles from the EARLY 20th century — this matches heading iii 'Early recommendations concerning business activities'.</span><span class="etext etext-vi"><b class="elang">VI:</b> Đoạn C nói về Frederick Taylor và các nguyên tắc quản lý khoa học TỪ ĐẦU THẾ KỶ 20 — khớp với heading iii 'Early recommendations concerning business activities'.</span></div><div class="explain-item"><b class="eq">Câu 30.</b> Đáp án đúng: <span class="eans">ii</span><span class="equote">&ldquo;the basic assumptions we hold in approaching how we work... order is a necessary condition for productivity. This assumption has also fostered the idea that disorder must be detrimental&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Paragraph D says the problem lies in BASIC ASSUMPTIONS (order is always necessary, disorder is always harmful) that are actually WRONG — this matches heading ii 'Fundamental beliefs that are in fact incorrect'.</span><span class="etext etext-vi"><b class="elang">VI:</b> Đoạn D nói vấn đề nằm ở những GIẢ ĐỊNH CƠ BẢN (trật tự luôn cần thiết, hỗn loạn luôn có hại) thực ra SAI — khớp với heading ii 'Fundamental beliefs that are in fact incorrect'.</span></div><div class="explain-item"><b class="eq">Câu 31.</b> Đáp án đúng: <span class="eans">ix</span><span class="equote">&ldquo;order actually has diminishing returns... eventually the usefulness of the process of organisation... reduce until the point where any further increase in order reduces productivity&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Paragraph E presents evidence that order has 'diminishing returns' and can even become counterproductive — this matches heading ix 'Evidence that a certain approach can have more disadvantages than advantages'.</span><span class="etext etext-vi"><b class="elang">VI:</b> Đoạn E đưa ra bằng chứng cho thấy trật tự có 'diminishing returns' (lợi ích giảm dần) và có thể phản tác dụng — khớp với heading ix 'Evidence that a certain approach can have more disadvantages than advantages'.</span></div><div class="explain-item"><b class="eq">Câu 32.</b> Đáp án đúng: <span class="eans">vii</span><span class="equote">&ldquo;when innovating, the best approach is to create an environment devoid of structure and hierarchy... can lead to new solutions that, under conventionally structured environments... would never be reached&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Paragraph F says an unstructured environment can achieve solutions that conventional, structured work NEVER achieves — this matches heading vii 'How to achieve outcomes that are currently impossible'.</span><span class="etext etext-vi"><b class="elang">VI:</b> Đoạn F nói môi trường phi cấu trúc giúp đạt được các giải pháp mà cách làm việc thông thường KHÔNG BAO GIỜ đạt được — khớp với heading vii 'How to achieve outcomes that are currently impossible'.</span></div><div class="explain-item"><b class="eq">Câu 33.</b> Đáp án đúng: <span class="eans">iv</span><span class="equote">&ldquo;Oticon... used what it called a 'spaghetti' structure... the former chairman of General Electric embraced disorganisation... Google and a number of other tech companies have embraced... these kinds of flexible structures&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Paragraph G gives CONCRETE examples of companies (Oticon, GE, Google) that put an unstructured model into practice — this matches heading iv 'Organisations that put a new approach into practice'.</span><span class="etext etext-vi"><b class="elang">VI:</b> Đoạn G nêu các ví dụ CỤ THỂ về công ty (Oticon, GE, Google) đã áp dụng mô hình phi cấu trúc vào thực tế — khớp với heading iv 'Organisations that put a new approach into practice'.</span></div><div class="explain-item"><b class="eq">Câu 34.</b> Đáp án đúng: <span class="eans">viii</span><span class="equote">&ldquo;disorder, much like order, also seems to have diminishing utility, and can also have detrimental effects on performance if overused&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Paragraph H warns that BOTH order AND disorder fail to guarantee continuous improvement if overused — this matches heading viii 'Neither approach guarantees continuous improvement'.</span><span class="etext etext-vi"><b class="elang">VI:</b> Đoạn H cảnh báo cả trật tự LẪN hỗn loạn đều không đảm bảo cải thiện liên tục nếu lạm dụng — khớp với heading viii 'Neither approach guarantees continuous improvement'.</span></div><div class="explain-item"><b class="eq">Câu 35.</b> Đáp án đúng: <span class="eans">productive</span><span class="equote">&ldquo;countless seminars and workshops take place around the world to tell a paying public that they ought to structure their lives&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Paragraph A says seminars target people who feel they are not 'productive' enough — this matches the gap 'Numerous training sessions are aimed at people who feel they are not ___ enough' → answer 'productive'.</span><span class="etext etext-vi"><b class="elang">VI:</b> Đoạn A nói các hội thảo nhắm tới những người cảm thấy mình chưa đủ 'productive' (năng suất) — khớp với câu 'Numerous training sessions are aimed at people who feel they are not ___ enough' → đáp án 'productive'.</span></div><div class="explain-item"><b class="eq">Câu 36.</b> Đáp án đúng: <span class="eans">perfectionists</span><span class="equote">&ldquo;much to the delight of self-proclaimed perfectionists with the need to get everything right&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Paragraph A says being organised appeals to self-declared 'perfectionists' — this matches the gap 'Being organised appeals to people who regard themselves as ___' → answer 'perfectionists'.</span><span class="etext etext-vi"><b class="elang">VI:</b> Đoạn A nói việc tổ chức gọn gàng làm hài lòng những người tự nhận là 'perfectionists' (người cầu toàn) — khớp với câu 'Being organised appeals to people who regard themselves as ___' → đáp án 'perfectionists'.</span></div><div class="explain-item"><b class="eq">Câu 37.</b> Đáp án đúng: <span class="eans">dissatisfied</span><span class="equote">&ldquo;A large proportion of workers from all demographics claim to be dissatisfied with the way their work is structured&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Paragraph B says many workers feel 'dissatisfied' with how their work is structured — this matches the gap 'Many people feel ___ with aspects of their work' → answer 'dissatisfied'.</span><span class="etext etext-vi"><b class="elang">VI:</b> Đoạn B nói nhiều người lao động cảm thấy 'dissatisfied' (bất mãn) với cách công việc được sắp xếp — khớp với câu 'Many people feel ___ with aspects of their work' → đáp án 'dissatisfied'.</span></div><div class="explain-item"><b class="eq">Câu 38.</b> Đáp án đúng: <span class="eans">TRUE</span><span class="equote">&ldquo;businesses and people spend time and money organising themselves for the sake of organising, rather than actually looking at the end goal and usefulness of such an effort&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Paragraph D says businesses and individuals pursue order FOR ITS OWN SAKE, without really considering the ultimate goal or value of doing so — this matches 'Both businesses and people aim at order without really considering its value' → answer TRUE.</span><span class="etext etext-vi"><b class="elang">VI:</b> Đoạn D nói doanh nghiệp/cá nhân theo đuổi trật tự chỉ VÌ trật tự, không thực sự xét đến mục tiêu/lợi ích cuối cùng — khớp với câu hỏi 'Both businesses and people aim at order without really considering its value' → đáp án TRUE.</span></div><div class="explain-item"><b class="eq">Câu 39.</b> Đáp án đúng: <span class="eans">FALSE</span><span class="equote">&ldquo;the best approach is to create an environment devoid of structure and hierarchy and enable everyone involved to engage as one organic group&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Question 39 claims innovation is most successful when people have DISTINCT, SEPARATE roles. The passage instead says the BEST environment for innovation is one devoid of structure and hierarchy — this contradicts the statement → answer FALSE.</span><span class="etext etext-vi"><b class="elang">VI:</b> Câu hỏi 39 nói đổi mới thành công nhất khi mọi người có VAI TRÒ RIÊNG BIỆT. Bài lại nói môi trường TỐT NHẤT cho đổi mới là PHI cấu trúc, PHI thứ bậc — trái ngược → đáp án FALSE.</span></div><div class="explain-item"><b class="eq">Câu 40.</b> Đáp án đúng: <span class="eans">NOT GIVEN</span><span class="equote">&ldquo;the former chairman of General Electric embraced disorganisation, putting forward the idea of the 'boundaryless' organisation... Google and a number of other tech companies have embraced (at least in part) these kinds of flexible structures&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Question 40 claims Google was inspired by GE's SUCCESS. The passage only says Google also adopted similar flexible structures; it never states that Google was directly inspired BY GE → answer NOT GIVEN.</span><span class="etext etext-vi"><b class="elang">VI:</b> Câu hỏi 40 nói Google lấy cảm hứng từ THÀNH CÔNG của GE. Bài chỉ nói Google cũng áp dụng cấu trúc linh hoạt tương tự, không hề nói rõ Google được truyền cảm hứng trực tiếp TỪ GE → đáp án NOT GIVEN.</span></div></div>
+  </div>
+</div>
+
+<button id="submitBtn" onclick="requestSubmit()">Nộp bài</button>
+
+<div class="modal-overlay hidden" id="confirmModal">
+  <div class="modal-box">
+    <h3>Xác nhận nộp bài</h3>
+    <p>Bạn có chắc muốn nộp bài? Sau khi nộp sẽ không thể sửa lại.</p>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="cancelSubmit()">Quay lại làm bài</button>
+      <button class="btn-confirm" onclick="confirmSubmit()">Xác nhận nộp</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="timeUpModal">
+  <div class="modal-box">
+    <h3>⏰ Hết giờ!</h3>
+    <p>Đã hết 60 phút làm bài. Bạn có 5 phút để nộp bài, sau đó bài sẽ tự động được nộp.</p>
+    <div class="modal-actions">
+      <button class="btn-confirm" style="flex:none;width:100%;" onclick="confirmSubmit()">Nộp bài ngay</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="resultModal">
+  <div class="modal-box" style="width:560px;">
+    <div id="resultBox"></div>
+    <div class="modal-actions"><button class="btn-cancel" style="flex:none;width:100%;" onclick="closeResult()">Đóng — Xem lại bài làm</button></div>
+  </div>
+</div>
+
+<script>
+var TEST_NUM = 4;
+var TOTAL_QUESTIONS = 40;
+var PASSAGE_COUNTS = [13, 13, 14];
+var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyfZgrcZfOw-g5nCLlQ5QyLCCADuct8QRxW31SG8F3IZfkgL0x_3LOoPWBHRFRNiXA1/exec";
+var ANS = {"1": ["population"], "2": ["suburbs"], "3": ["businessmen"], "4": ["funding"], "5": ["press"], "6": ["soil"], "7": "FALSE", "8": "NOT GIVEN", "9": "TRUE", "10": "TRUE", "11": "FALSE", "12": "FALSE", "13": "NOT GIVEN", "14": "B", "15": "A", "16": "C", "17": "E", "18": "B", "19": "B", "20": "C", "21": "C", "22": ["fire"], "23": ["nutrients"], "24": ["cavities"], "25": ["hawthorn"], "26": ["rare"], "27": "vi", "28": "i", "29": "iii", "30": "ii", "31": "ix", "32": "vii", "33": "iv", "34": "viii", "35": ["productive"], "36": ["perfectionists"], "37": ["dissatisfied"], "38": "TRUE", "39": "FALSE", "40": "NOT GIVEN"};
+var UNITS = [{"type": "text", "n": 1}, {"type": "text", "n": 2}, {"type": "text", "n": 3}, {"type": "text", "n": 4}, {"type": "text", "n": 5}, {"type": "text", "n": 6}, {"type": "radio", "n": 7}, {"type": "radio", "n": 8}, {"type": "radio", "n": 9}, {"type": "radio", "n": 10}, {"type": "radio", "n": 11}, {"type": "radio", "n": 12}, {"type": "radio", "n": 13}, {"type": "select", "n": 14}, {"type": "select", "n": 15}, {"type": "select", "n": 16}, {"type": "select", "n": 17}, {"type": "select", "n": 18}, {"type": "select", "n": 19}, {"type": "select", "n": 20}, {"type": "select", "n": 21}, {"type": "text", "n": 22}, {"type": "text", "n": 23}, {"type": "text", "n": 24}, {"type": "text", "n": 25}, {"type": "text", "n": 26}, {"type": "select", "n": 27}, {"type": "select", "n": 28}, {"type": "select", "n": 29}, {"type": "select", "n": 30}, {"type": "select", "n": 31}, {"type": "select", "n": 32}, {"type": "select", "n": 33}, {"type": "select", "n": 34}, {"type": "text", "n": 35}, {"type": "text", "n": 36}, {"type": "text", "n": 37}, {"type": "radio", "n": 38}, {"type": "radio", "n": 39}, {"type": "radio", "n": 40}];
+var CHECKBOX_GROUPS = [];
+</script>
+<script>
+/* ===================== READING TEST ENGINE (shared) ===================== */
+/* Requires globals defined in the per-test <script> block BEFORE this file:
+   TEST_NUM, TOTAL_QUESTIONS, PASSAGE_COUNTS ([n1,n2,n3]), ANS {}, UNITS [], APPS_SCRIPT_URL
+*/
+(function(){
+  'use strict';
+
+  function pad(n,len){ n=String(n); while(n.length<len) n='0'+n; return n; }
+  function qLabel(n){ return 'Q.'+pad(n,2)+'.TEST'+pad(TEST_NUM,3); }
+  function norm(s){ return String(s==null?'':s).toLowerCase().trim().replace(/\s+/g,' '); }
+  window.qLabel = qLabel;
+
+  /* ---------------- Popup / start ---------------- */
+  window._studentName = '';
+  window._studentClass = '';
+  window._testStartTime = null;
+  var submitted = false;
+  var timerStopped = false;
+
+  window.startExam = function(){
+    var nameEl = document.getElementById('stuName');
+    var classEl = document.getElementById('stuClass');
+    var errEl = document.getElementById('nameErr');
+    var name = nameEl.value.trim();
+    var cls = classEl.value.trim();
+    if(!name || !cls){
+      errEl.textContent = 'Vui lòng nhập đầy đủ Họ và tên và Lớp.';
+      return;
+    }
+    errEl.textContent = '';
+    window._studentName = name;
+    window._studentClass = cls;
+    window._testStartTime = Date.now();
+    document.getElementById('nameOverlay').classList.add('hidden');
+    window.enterFullscreen();
+  };
+
+  /* ---------------- Fullscreen / anti-cheat ---------------- */
+  var fsViolations = 0, tabViolations = 0, focusViolations = 0;
+  var violationLog = [];
+
+  window.enterFullscreen = function(){
+    var el = document.documentElement;
+    try{
+      if(el.requestFullscreen) el.requestFullscreen().catch(function(){});
+      else if(el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+    }catch(e){}
+    var ov = document.getElementById('fsOverlay');
+    if(ov) ov.style.display = 'none';
+  };
+
+  function isFullscreen(){
+    return !!(document.fullscreenElement || document.webkitFullscreenElement);
+  }
+
+  function onFsChange(){
+    if(submitted) return;
+    if(!window._testStartTime) return;
+    if(!isFullscreen()){
+      fsViolations++;
+      violationLog.push('Thoát fullscreen lúc ' + new Date().toLocaleTimeString());
+      var ov = document.getElementById('fsOverlay');
+      if(ov) ov.style.display = 'flex';
+    }
+  }
+  document.addEventListener('fullscreenchange', onFsChange);
+  document.addEventListener('webkitfullscreenchange', onFsChange);
+
+  document.addEventListener('visibilitychange', function(){
+    if(submitted || !window._testStartTime) return;
+    if(document.hidden){
+      tabViolations++;
+      violationLog.push('Chuyển tab lúc ' + new Date().toLocaleTimeString());
+      showBanner('⚠ Phát hiện chuyển tab! Vi phạm được ghi nhận.');
+    }
+  });
+
+  window.addEventListener('blur', function(){
+    if(submitted || !window._testStartTime) return;
+    focusViolations++;
+    violationLog.push('Mất focus cửa sổ lúc ' + new Date().toLocaleTimeString());
+    showBanner('⚠ Phát hiện mất focus cửa sổ! Vi phạm được ghi nhận.');
+  });
+
+  function showBanner(msg){
+    var b = document.getElementById('warnBanner');
+    if(!b) return;
+    b.textContent = msg;
+    b.style.display = 'block';
+    clearTimeout(b._t);
+    b._t = setTimeout(function(){ b.style.display = 'none'; }, 4000);
+  }
+
+  document.addEventListener('contextmenu', function(e){ if(submitted) return; e.preventDefault(); });
+  document.addEventListener('copy', function(e){ if(submitted) return; e.preventDefault(); });
+  document.addEventListener('paste', function(e){ if(submitted) return; e.preventDefault(); });
+  document.addEventListener('cut', function(e){ if(submitted) return; e.preventDefault(); });
+  document.addEventListener('dragstart', function(e){ if(submitted) return; e.preventDefault(); });
+  document.addEventListener('drop', function(e){ if(submitted) return; e.preventDefault(); });
+
+  document.addEventListener('keydown', function(e){
+    if(submitted) return;
+    var k = e.key;
+    if(k === 'F12'){ e.preventDefault(); return; }
+    if(e.ctrlKey && ['c','C','a','A','s','S','u','U','p','P','v','V'].indexOf(k) !== -1){ e.preventDefault(); return; }
+    if(e.ctrlKey && e.shiftKey && ['i','I','j','J','c','C','k','K'].indexOf(k) !== -1){ e.preventDefault(); return; }
+    if(k === 'Escape'){ e.preventDefault(); return; }
+  });
+
+  window.getViolationLog = function(){
+    submitted = true;
+    return { tabViolations: tabViolations, focusViolations: focusViolations, fsViolations: fsViolations, log: violationLog };
+  };
+  window.stopTimer = function(){ timerStopped = true; };
+
+  /* ---------------- Timer ---------------- */
+  (function(){
+    var DURATION = 60*60*1000, EXTRA = 5*60*1000;
+    var startTime = null, extraTriggered = false, autoSubmitted = false;
+    function fmt(ms){
+      if(ms<0) ms=0;
+      var s = Math.floor(ms/1000);
+      var m = Math.floor(s/60); s = s%60;
+      return pad(m,2)+':'+pad(s,2);
+    }
+    function tick(){
+      if(!startTime){
+        if(!window._testStartTime){ requestAnimationFrame(tick); return; }
+        startTime = window._testStartTime;
+      }
+      if(timerStopped) return;
+      var box = document.getElementById('timerBox');
+      var elapsed = Date.now() - startTime;
+      var remain = DURATION - elapsed;
+      if(remain <= 0 && !extraTriggered){
+        extraTriggered = true;
+        showTimeUpModal();
+        remain = 0 - (Date.now() - (startTime+DURATION));
+      }
+      if(remain <= -EXTRA && !autoSubmitted){
+        autoSubmitted = true;
+        doSubmit();
+        return;
+      }
+      if(box){
+        var showMs = extraTriggered ? (EXTRA + (DURATION - elapsed)) : remain;
+        box.textContent = fmt(Math.max(0,showMs));
+        box.classList.remove('warn','danger');
+        if(!extraTriggered){
+          if(remain <= 2*60*1000) box.classList.add('danger');
+          else if(remain <= 10*60*1000) box.classList.add('warn');
+        } else {
+          box.classList.add('danger');
+        }
+      }
+      setTimeout(tick, 500);
+    }
+    function showTimeUpModal(){
+      var m = document.getElementById('timeUpModal');
+      if(m) m.classList.remove('hidden');
+    }
+    window._timerTick = tick;
+    requestAnimationFrame(tick);
+  })();
+
+  /* ---------------- Tabs ---------------- */
+  window.showPassage = function(idx){
+    for(var i=0;i<3;i++){
+      var p = document.getElementById('passage-'+i);
+      var q = document.getElementById('questions-'+i);
+      var t = document.getElementById('tabBtn-'+i);
+      if(!p) continue;
+      if(i===idx){ p.classList.add('active'); q.classList.add('active'); t.classList.add('active'); }
+      else { p.classList.remove('active'); q.classList.remove('active'); t.classList.remove('active'); }
+    }
+  };
+
+  /* ---------------- Split divider ---------------- */
+  function initDivider(){
+    var dragging = false;
+    var divider = document.getElementById('divider');
+    var area = document.getElementById('examArea');
+    if(!divider) return;
+    function onMove(clientX){
+      var rect = area.getBoundingClientRect();
+      var pct = (clientX - rect.left) / rect.width * 100;
+      pct = Math.max(20, Math.min(80, pct));
+      document.querySelectorAll('.passage-panel').forEach(function(el){ el.style.width = pct+'%'; });
+      document.querySelectorAll('.question-panel').forEach(function(el){ el.style.width = (100-pct)+'%'; });
+    }
+    divider.addEventListener('mousedown', function(e){ dragging = true; e.preventDefault(); });
+    document.addEventListener('mousemove', function(e){ if(dragging) onMove(e.clientX); });
+    document.addEventListener('mouseup', function(){ dragging = false; });
+    divider.addEventListener('touchstart', function(e){ dragging = true; }, {passive:true});
+    document.addEventListener('touchmove', function(e){ if(dragging && e.touches[0]) onMove(e.touches[0].clientX); }, {passive:true});
+    document.addEventListener('touchend', function(){ dragging = false; });
+  }
+
+  /* ---------------- Highlight ---------------- */
+  var currentColor = 'yellow';
+  var eraserMode = false;
+  var penMode = false;
+  var penEraseMode = false;
+  var penColor = 'red';
+
+  function initHighlightToolbar(){
+    document.querySelectorAll('.hl-btn').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        currentColor = btn.getAttribute('data-c');
+        eraserMode = false;
+        document.querySelectorAll('.hl-btn').forEach(function(b){ b.classList.remove('active'); });
+        btn.classList.add('active');
+        document.getElementById('eraserBtn').classList.remove('active');
+      });
+    });
+    var er = document.getElementById('eraserBtn');
+    if(er) er.addEventListener('click', function(){
+      eraserMode = !eraserMode;
+      er.classList.toggle('active', eraserMode);
+    });
+    var first = document.querySelector('.hl-btn[data-c="yellow"]');
+    if(first) first.classList.add('active');
+  }
+
+  function wrapRange(range, cls){
+    var frag = range.extractContents();
+    var span = document.createElement('span');
+    span.className = cls;
+    span.appendChild(frag);
+    range.insertNode(span);
+  }
+
+  function handleMouseUp(container){
+    var sel = window.getSelection();
+    if(!sel || sel.isCollapsed || sel.rangeCount===0) return;
+    var range = sel.getRangeAt(0);
+    if(!container.contains(range.commonAncestorContainer)) return;
+    var tag = range.commonAncestorContainer.nodeType===1 ? range.commonAncestorContainer.tagName : range.commonAncestorContainer.parentElement.tagName;
+    if(['INPUT','SELECT','TEXTAREA'].indexOf(tag)!==-1) return;
+    if(submitted){
+      var rect = range.getBoundingClientRect();
+      var text = sel.toString();
+      sel.removeAllRanges();
+      doDictLookup(text, rect);
+      return;
+    }
+    if(eraserMode || penMode) return;
+    try{
+      wrapRange(range, 'hl-'+currentColor);
+    }catch(e){}
+    sel.removeAllRanges();
+  }
+
+  function handleEraseClick(e){
+    if(!eraserMode) return;
+    var el = e.target;
+    if(el.classList && (el.classList.contains('hl-yellow')||el.classList.contains('hl-green')||el.classList.contains('hl-pink'))){
+      var parent = el.parentNode;
+      while(el.firstChild) parent.insertBefore(el.firstChild, el);
+      parent.removeChild(el);
+    }
+  }
+
+  function initHighlightZones(){
+    document.querySelectorAll('.passage-panel, .question-panel').forEach(function(zone){
+      zone.addEventListener('mouseup', function(){ handleMouseUp(zone); });
+      zone.addEventListener('click', function(e){ handleEraseClick(e); });
+      zone.addEventListener('touchend', function(){ handleMouseUp(zone); });
+      zone.addEventListener('dblclick', function(){
+        if(!submitted) return;
+        var sel = window.getSelection();
+        if(!sel || sel.isCollapsed || sel.rangeCount===0) return;
+        var range = sel.getRangeAt(0);
+        var rect = range.getBoundingClientRect();
+        var text = sel.toString();
+        doDictLookup(text, rect);
+      });
+    });
+  }
+
+  /* ---------------- Selected-answer highlight ---------------- */
+  function initSelectedAnswerHighlight(){
+    document.querySelectorAll('input[type=radio], input[type=checkbox]').forEach(function(inp){
+      inp.addEventListener('change', function(){
+        var label = inp.closest('.opt-row');
+        if(inp.type==='radio'){
+          document.querySelectorAll('input[name="'+inp.name+'"]').forEach(function(o){
+            var l = o.closest('.opt-row');
+            if(l) l.classList.remove('selected-answer');
+          });
+          if(inp.checked && label) label.classList.add('selected-answer');
+        } else {
+          if(label) label.classList.toggle('selected-answer', inp.checked);
+        }
+      });
+    });
+  }
+
+  /* ---------------- Checkbox group max-limit ---------------- */
+  window.wireCheckboxLimit = function(name, max){
+    function showLimit(){
+      var id = 'chk-limit-'+name;
+      var el = document.getElementById(id);
+      if(!el){
+        el = document.createElement('div');
+        el.id = id;
+        el.style.cssText = 'color:#e74c3c;font-size:12px;font-weight:bold;margin-top:4px;';
+        var grp = document.querySelector('input[name="'+name+'"]');
+        if(grp && grp.parentNode && grp.parentNode.parentNode) grp.parentNode.parentNode.appendChild(el);
+      }
+      el.textContent = '⚠ Chỉ được chọn tối đa ' + max + ' đáp án!';
+      clearTimeout(el._t);
+      el._t = setTimeout(function(){ el.textContent=''; }, 2500);
+    }
+    document.querySelectorAll('input[name="'+name+'"]').forEach(function(inp){
+      inp.addEventListener('change', function(){
+        if(inp.checked){
+          var n = document.querySelectorAll('input[name="'+name+'"]:checked').length;
+          if(n>max){ inp.checked=false; inp.dispatchEvent(new Event('_uncheck')); showLimit();
+            var label = inp.closest('.opt-row'); if(label) label.classList.remove('selected-answer');
+          }
+        }
+      });
+    });
+  };
+
+  /* ---------------- Pen (freehand drawing) tool ---------------- */
+  var SVG_NS = 'http://www.w3.org/2000/svg';
+  var drawLayers = []; // {zone, svg}
+
+  function initDrawLayers(){
+    document.querySelectorAll('.passage-panel, .question-panel').forEach(function(zone){
+      var svg = document.createElementNS(SVG_NS, 'svg');
+      svg.setAttribute('class', 'draw-layer');
+      svg.style.height = Math.max(zone.scrollHeight, zone.clientHeight) + 'px';
+      zone.appendChild(svg);
+      drawLayers.push({zone: zone, svg: svg});
+      wireDrawing(zone, svg);
+    });
+  }
+
+  function resizeDrawLayer(entry){
+    entry.svg.style.height = Math.max(entry.zone.scrollHeight, entry.zone.clientHeight) + 'px';
+  }
+
+  function wireDrawing(zone, svg){
+    var drawing = false;
+    var curPath = null;
+    var pts = [];
+
+    function pos(ev){
+      var rect = zone.getBoundingClientRect();
+      var cx = (ev.touches ? ev.touches[0].clientX : ev.clientX);
+      var cy = (ev.touches ? ev.touches[0].clientY : ev.clientY);
+      return { x: cx - rect.left + zone.scrollLeft, y: cy - rect.top + zone.scrollTop };
+    }
+
+    function startDraw(ev){
+      if(!penMode || penEraseMode || submitted) return;
+      var tag = ev.target.tagName;
+      if(['INPUT','SELECT','TEXTAREA','A'].indexOf(tag)!==-1) return;
+      drawing = true;
+      pts = [];
+      var p = pos(ev);
+      pts.push(p.x.toFixed(1)+','+p.y.toFixed(1));
+      curPath = document.createElementNS(SVG_NS, 'polyline');
+      curPath.setAttribute('points', pts.join(' '));
+      curPath.setAttribute('fill', 'none');
+      curPath.setAttribute('stroke', penColor==='red' ? '#e53935' : (penColor==='blue' ? '#1e88e5' : '#222'));
+      curPath.setAttribute('stroke-width', '2.2');
+      curPath.setAttribute('stroke-linecap', 'round');
+      curPath.setAttribute('stroke-linejoin', 'round');
+      svg.appendChild(curPath);
+      ev.preventDefault();
+    }
+    function moveDraw(ev){
+      if(!drawing || !curPath) return;
+      var p = pos(ev);
+      pts.push(p.x.toFixed(1)+','+p.y.toFixed(1));
+      curPath.setAttribute('points', pts.join(' '));
+      ev.preventDefault();
+    }
+    function endDraw(){
+      drawing = false;
+      curPath = null;
+      pts = [];
+    }
+    function eraseAt(ev){
+      if(!penEraseMode || submitted) return;
+      var p = pos(ev);
+      var els = svg.querySelectorAll('polyline');
+      for(var i=0;i<els.length;i++){
+        var el = els[i];
+        var box = el.getBBox();
+        var pad = 8;
+        if(p.x >= box.x-pad && p.x <= box.x+box.width+pad && p.y >= box.y-pad && p.y <= box.y+box.height+pad){
+          el.remove();
+        }
+      }
+    }
+
+    svg.addEventListener('mousedown', function(ev){
+      if(penEraseMode){ eraseAt(ev); return; }
+      startDraw(ev);
+    });
+    svg.addEventListener('mousemove', moveDraw);
+    svg.addEventListener('mouseup', endDraw);
+    svg.addEventListener('mouseleave', endDraw);
+    svg.addEventListener('touchstart', function(ev){
+      if(penEraseMode){ eraseAt(ev); return; }
+      startDraw(ev);
+    }, {passive:false});
+    svg.addEventListener('touchmove', moveDraw, {passive:false});
+    svg.addEventListener('touchend', endDraw);
+  }
+
+  function updatePenLayers(){
+    drawLayers.forEach(function(entry){
+      resizeDrawLayer(entry);
+      entry.svg.classList.toggle('pen-active', penMode && !penEraseMode);
+      entry.svg.classList.toggle('pen-erase', penMode && penEraseMode);
+    });
+  }
+
+  function initPenTool(){
+    var btn = document.getElementById('penBtn');
+    var eraseBtn = document.getElementById('penEraserBtn');
+    var colorBtns = document.querySelectorAll('.pen-color-btn');
+    if(!btn) return;
+    function setColorBtnsVisible(show){
+      colorBtns.forEach(function(b){ b.classList.toggle('show', show); });
+      if(eraseBtn) eraseBtn.classList.toggle('show', show);
+    }
+    colorBtns.forEach(function(b){
+      if(b.getAttribute('data-pc')===penColor) b.classList.add('active');
+      b.addEventListener('click', function(){
+        penColor = b.getAttribute('data-pc');
+        penEraseMode = false;
+        if(eraseBtn) eraseBtn.classList.remove('active');
+        colorBtns.forEach(function(o){ o.classList.remove('active'); });
+        b.classList.add('active');
+        updatePenLayers();
+      });
+    });
+    btn.addEventListener('click', function(){
+      penMode = !penMode;
+      btn.classList.toggle('active', penMode);
+      document.body.classList.toggle('pen-mode', penMode);
+      setColorBtnsVisible(penMode);
+      if(penMode){
+        eraserMode = false;
+        var er = document.getElementById('eraserBtn');
+        if(er) er.classList.remove('active');
+      } else {
+        penEraseMode = false;
+        if(eraseBtn) eraseBtn.classList.remove('active');
+      }
+      updatePenLayers();
+    });
+    if(eraseBtn){
+      eraseBtn.addEventListener('click', function(){
+        penEraseMode = !penEraseMode;
+        eraseBtn.classList.toggle('active', penEraseMode);
+        updatePenLayers();
+      });
+    }
+  }
+
+  /* ---------------- Post-submit dictionary lookup ---------------- */
+  function dictEsc(s){
+    return String(s).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+  function removeDictPopup(){
+    var el = document.getElementById('dictPopup');
+    if(el) el.remove();
+  }
+  function showDictPopup(innerHtml, rect, wide){
+    // keep existing popup element in place if it already exists (avoids losing
+    // scroll position while a multi-chunk translation is progressively updated)
+    var el = document.getElementById('dictPopup');
+    var isNew = !el;
+    if(!el){
+      el = document.createElement('div');
+      el.className = 'dict-popup';
+      el.id = 'dictPopup';
+      document.body.appendChild(el);
+    }
+    el.classList.toggle('dict-popup-wide', !!wide);
+    el.innerHTML = '<span class="dict-close">✕</span><div class="dict-body">' + innerHtml + '</div>';
+    el.querySelector('.dict-close').addEventListener('click', removeDictPopup);
+    if(isNew){
+      var popW = wide ? 480 : 320;
+      var top = rect.bottom + 8;
+      var left = rect.left;
+      var maxLeft = window.innerWidth - popW - 16;
+      if(left > maxLeft) left = Math.max(8, maxLeft);
+      if(left < 8) left = 8;
+      var maxTop = window.innerHeight - 90;
+      if(top > maxTop) top = Math.max(8, rect.top - 90);
+      el.style.top = Math.max(8,top) + 'px';
+      el.style.left = left + 'px';
+    }
+  }
+  // MyMemory's free/anonymous endpoint truncates or degrades quality on long queries
+  // (roughly >450-500 chars), so long selections are split into sentence-sized chunks
+  // and translated sequentially, then re-assembled — this is what makes long-passage
+  // translation actually show the FULL translated text instead of one short fragment.
+  function splitIntoChunks(text, maxLen){
+    var sentences = text.match(/[^.!?]+[.!?]*(\s+|$)/g) || [text];
+    var chunks = [];
+    var cur = '';
+    sentences.forEach(function(s){
+      if(s.length > maxLen){
+        // a single "sentence" is itself too long (no punctuation) — hard-split it
+        if(cur){ chunks.push(cur); cur = ''; }
+        for(var i=0;i<s.length;i+=maxLen){ chunks.push(s.slice(i, i+maxLen)); }
+        return;
+      }
+      if((cur+s).length > maxLen){
+        chunks.push(cur);
+        cur = s;
+      } else {
+        cur += s;
+      }
+    });
+    if(cur) chunks.push(cur);
+    return chunks.map(function(c){ return c.trim(); }).filter(Boolean);
+  }
+  function translateChunk(chunk){
+    return fetch('https://api.mymemory.translated.net/get?q='+encodeURIComponent(chunk)+'&langpair=en|vi')
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        var t = data && data.responseData && data.responseData.translatedText;
+        return t || '(không dịch được đoạn này)';
+      })
+      .catch(function(){ return '⚠ Lỗi kết nối dịch đoạn này.'; });
+  }
+  function doDictLookup(text, rect){
+    if(!text) return;
+    text = text.trim().replace(/\s+/g,' ');
+    if(!text) return;
+    var MAX_LOOKUP = 3000;
+    if(text.length > MAX_LOOKUP) text = text.slice(0, MAX_LOOKUP);
+
+    var isLong = text.length > 70;
+    if(!isLong){
+      showDictPopup('<b>'+dictEsc(text)+'</b><br>Đang dịch…', rect, false);
+      translateChunk(text).then(function(t){
+        showDictPopup('<b>'+dictEsc(text)+'</b><br>→ '+dictEsc(t), rect, false);
+      });
+      return;
+    }
+
+    // Long passage: chunk it, translate sequentially, render full original +
+    // full translation (both scrollable) so nothing gets cut short.
+    var chunks = splitIntoChunks(text, 450);
+    var translated = new Array(chunks.length).fill('');
+    function render(progressIdx){
+      var status = (progressIdx < chunks.length)
+        ? '<div class="dict-progress">Đang dịch… ('+(progressIdx+1)+'/'+chunks.length+')</div>' : '';
+      var html = '<div class="dict-orig"><b>Đoạn gốc:</b><br>'+dictEsc(text)+'</div>'
+        + '<div class="dict-trans"><b>Bản dịch:</b><br>'+dictEsc(translated.join(' ').trim() || '…')+'</div>'
+        + status;
+      showDictPopup(html, rect, true);
+    }
+    render(0);
+    var chain = Promise.resolve();
+    chunks.forEach(function(chunk, idx){
+      chain = chain.then(function(){
+        return translateChunk(chunk).then(function(t){
+          translated[idx] = t;
+          render(idx+1);
+        });
+      });
+    });
+  }
+
+  function enablePostExamTools(){
+    var tag = document.getElementById('dictModeTag');
+    if(tag) tag.classList.add('show');
+    var hlbar = document.getElementById('hlToolbar');
+    if(hlbar) hlbar.style.display = 'none';
+    var b = document.getElementById('warnBanner');
+    if(b) b.style.display = 'none';
+    var ov = document.getElementById('fsOverlay');
+    if(ov) ov.style.display = 'none';
+    document.body.classList.remove('pen-mode');
+    penMode = false; penEraseMode = false;
+    var pb = document.getElementById('penBtn'); if(pb) pb.classList.remove('active');
+    document.querySelectorAll('.pen-color-btn, #penEraserBtn').forEach(function(b){ b.classList.remove('show','active'); });
+    drawLayers.forEach(function(entry){ entry.svg.classList.remove('pen-active','pen-erase'); });
+    document.querySelectorAll('.explain-panel').forEach(function(p){ p.style.display = 'block'; });
+  }
+
+  /* ---------------- Grading helpers ---------------- */
+  function getRadio(name){
+    var el = document.querySelector('input[name="'+name+'"]:checked');
+    return el ? el.value : '';
+  }
+  function getChecked(name){
+    var out = [];
+    document.querySelectorAll('input[name="'+name+'"]:checked').forEach(function(el){ out.push(el.value); });
+    return out;
+  }
+  function getSelect(name){
+    var el = document.getElementById(name);
+    return el ? el.value : '';
+  }
+  function getText(name){
+    var el = document.getElementById(name);
+    return el ? el.value : '';
+  }
+  function textMatches(val, ansArr){
+    var v = norm(val);
+    if(!v) return false;
+    for(var i=0;i<ansArr.length;i++){ if(norm(ansArr[i])===v) return true; }
+    return false;
+  }
+
+  /* ---------------- Submit flow ---------------- */
+  window.requestSubmit = function(){
+    document.getElementById('confirmModal').classList.remove('hidden');
+  };
+  window.cancelSubmit = function(){
+    document.getElementById('confirmModal').classList.add('hidden');
+  };
+  window.confirmSubmit = function(){
+    document.getElementById('confirmModal').classList.add('hidden');
+    doSubmit();
+  };
+
+  function passageIndexOfQ(n){
+    var c = PASSAGE_COUNTS, acc = 0;
+    for(var i=0;i<3;i++){ acc += c[i]; if(n<=acc) return i; }
+    return 2;
+  }
+
+  function doSubmit(){
+    if(submitted) return;
+    submitted = true;
+    window.getViolationLog();
+    window.stopTimer();
+    var box = document.getElementById('timerBox');
+    if(box) box.style.display = 'none';
+    var tuModal = document.getElementById('timeUpModal');
+    if(tuModal) tuModal.classList.add('hidden');
+
+    var pScore = [0,0,0], pTotal = PASSAGE_COUNTS.slice();
+    var totalCorrect = 0;
+    var detailsParts = [];
+    var doneGroups = {};
+
+    UNITS.forEach(function(u){
+      if(u.type==='checkboxGroup'){
+        if(doneGroups[u.group]) return;
+        doneGroups[u.group] = true;
+        var chosen = getChecked(u.group);
+        var correct = ANS[u.group];
+        var matched = chosen.filter(function(v){ return correct.indexOf(v)!==-1; });
+        var score = Math.min(matched.length, u.max);
+        var pIdx = passageIndexOfQ(u.members[0]);
+        pScore[pIdx] += score;
+        totalCorrect += score;
+        // color options
+        document.querySelectorAll('input[name="'+u.group+'"]').forEach(function(inp){
+          var label = inp.closest('.opt-row');
+          if(!label) return;
+          if(inp.checked && correct.indexOf(inp.value)!==-1) label.classList.add('correct');
+          else if(inp.checked && correct.indexOf(inp.value)===-1) label.classList.add('incorrect');
+          else if(!inp.checked && correct.indexOf(inp.value)!==-1) label.style.outline = '2px dashed #e8b800';
+        });
+        var parts = chosen.map(function(v){ return v + (correct.indexOf(v)>=0 ? '✔' : '✘'); });
+        var missed = correct.filter(function(v){ return chosen.indexOf(v)<0; }).map(function(v){ return v+'(đáp án)'; });
+        detailsParts.push('Q'+u.members.join('-')+':['+parts.concat(missed).join(' ')+']');
+        return;
+      }
+      var n = u.n;
+      var pIdx = passageIndexOfQ(n);
+      var ok = false, val = '';
+      if(u.type==='radio'){
+        val = getRadio('q'+n);
+        ok = (val === ANS[n]);
+        document.querySelectorAll('input[name="q'+n+'"]').forEach(function(inp){
+          var label = inp.closest('.opt-row');
+          if(!label) return;
+          if(inp.value === ANS[n]) label.classList.add('correct');
+          else if(inp.checked) label.classList.add('incorrect');
+        });
+      } else if(u.type==='select'){
+        val = getSelect('q'+n);
+        ok = (val === ANS[n]);
+        var sel = document.getElementById('q'+n);
+        if(sel) sel.classList.add(ok?'correct-cell':'incorrect-cell');
+      } else { // text
+        val = getText('q'+n);
+        ok = textMatches(val, ANS[n]);
+        var inp2 = document.getElementById('q'+n);
+        if(inp2) inp2.classList.add(ok?'correct-cell':'incorrect-cell');
+        if(!ok){
+          var hint = document.getElementById('hint-q'+n);
+          if(hint) hint.textContent = ' (Đáp án: ' + ANS[n][0] + ')';
+        }
+      }
+      if(ok){ pScore[pIdx]++; totalCorrect++; }
+      detailsParts.push('Q'+n+':'+(ok?'✔':'✘')+'('+val+')');
+    });
+
+    // lock inputs
+    document.querySelectorAll('input,select,textarea').forEach(function(el){
+      if(el.id==='stuName'||el.id==='stuClass') return;
+      el.disabled = true;
+    });
+
+    enablePostExamTools();
+
+    var total = TOTAL_QUESTIONS;
+    var band = computeBand(totalCorrect, total);
+    var elapsedMs = Date.now() - window._testStartTime;
+    var elapsedMin = Math.floor(elapsedMs/60000), elapsedSec = Math.floor((elapsedMs%60000)/1000);
+    var timeTaken = elapsedMin+' phút '+elapsedSec+' giây';
+
+    showResult(pScore, pTotal, totalCorrect, total, band, timeTaken);
+
+    var vlog = { tabViolations: tabViolations, focusViolations: focusViolations, fsViolations: fsViolations };
+    var payload = {
+      action: 'save_result',
+      timestamp: new Date().toISOString(),
+      student: window._studentName + ' — ' + window._studentClass,
+      test: 'Reading Test ' + TEST_NUM,
+      score: totalCorrect,
+      total: total,
+      band: band,
+      timeTaken: timeTaken,
+      p1score: pScore[0]+'/'+pTotal[0],
+      p2score: pScore[1]+'/'+pTotal[1],
+      p3score: pScore[2]+'/'+pTotal[2],
+      tabViol: vlog.tabViolations,
+      focusViol: vlog.focusViolations,
+      fsViol: vlog.fsViolations,
+      details: detailsParts.join(' | ')
+    };
+    fetch(APPS_SCRIPT_URL, {
+      method:'POST', mode:'no-cors',
+      headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body: JSON.stringify(payload)
+    }).catch(function(){});
+  }
+
+  function computeBand(score, total){
+    var s = Math.round(score/total*40);
+    if(s>=39) return '9';
+    if(s>=37) return '8.5';
+    if(s>=35) return '8';
+    if(s>=33) return '7.5';
+    if(s>=30) return '7';
+    if(s>=27) return '6.5';
+    if(s>=23) return '6';
+    if(s>=19) return '5.5';
+    if(s>=15) return '5';
+    if(s>=13) return '4.5';
+    if(s>=10) return '4';
+    return '< 4';
+  }
+
+  function showResult(pScore, pTotal, totalCorrect, total, band, timeTaken){
+    var box = document.getElementById('resultBox');
+    var html = '<h3>Kết quả bài thi</h3>';
+    html += '<p>Thí sinh: <b>'+esc(window._studentName)+'</b> — Lớp: <b>'+esc(window._studentClass)+'</b></p>';
+    html += '<p>Thời gian làm bài: <b>'+timeTaken+'</b></p>';
+    html += '<table><tr><th>Passage</th><th>Điểm</th></tr>';
+    for(var i=0;i<3;i++){ html += '<tr><td>Passage '+(i+1)+'</td><td>'+pScore[i]+'/'+pTotal[i]+'</td></tr>'; }
+    html += '<tr><td><b>Tổng điểm</b></td><td><b>'+totalCorrect+'/'+total+'</b></td></tr></table>';
+    html += '<p>Band ước tính: <span class="band-badge">Band '+band+'</span></p>';
+    html += '<p style="font-size:12.5px;color:#667;">Báo cáo vi phạm — Chuyển tab: '+tabViolations+' | Mất focus: '+focusViolations+' | Thoát fullscreen: '+fsViolations+'</p>';
+    html += '<p style="font-size:12.5px;color:#667;">Các ô được tô <span style="color:var(--green);font-weight:700;">xanh</span> là đáp án đúng, tô <span style="color:var(--red);font-weight:700;">đỏ</span> là sai. Đáp án đúng bị bỏ sót (checkbox) được viền nét đứt vàng.</p>';
+    box.innerHTML = html;
+    document.getElementById('resultModal').classList.remove('hidden');
+  }
+  window.closeResult = function(){
+    document.getElementById('resultModal').classList.add('hidden');
+  };
+  function esc(s){
+    return String(s).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+
+  /* ---------------- Init (script is at end of body, DOM already ready — wire directly) ---------------- */
+  initHighlightToolbar();
+  initHighlightZones();
+  initSelectedAnswerHighlight();
+  initDrawLayers();
+  initPenTool();
+  initDivider();
+  if(window.CHECKBOX_GROUPS){
+    window.CHECKBOX_GROUPS.forEach(function(g){ window.wireCheckboxLimit(g.name, g.max); });
+  }
+
+})();
+
+</script>
+</body>
+</html>

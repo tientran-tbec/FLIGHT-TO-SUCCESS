@@ -1,0 +1,1276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>IELTS Reading Test 8</title>
+<style>
+:root{
+  --blue:#1a56b0; --blue-dark:#123e82; --green:#1e8e3e; --red:#d93025; --orange:#e8710a;
+  --gray-bg:#f4f6f8; --border:#d7dde3; --hl-yellow:#FFE066; --hl-green:#90EE90; --hl-pink:#FFB6C1;
+  --sel-orange:#FFD580;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;height:100%;font-family:"Segoe UI",Arial,sans-serif;color:#1b1f23;background:#fff;}
+body{user-select:none;}
+input[type="text"],select,textarea{user-select:text;}
+.passage-panel, .question-panel{user-select:text;}
+input,select,textarea{font-family:inherit;font-size:14px;}
+@media print{ body{display:none !important;} }
+
+/* ---------- Popup ---------- */
+#nameOverlay{position:fixed;inset:0;background:rgba(10,20,40,.78);display:flex;align-items:center;justify-content:center;z-index:9999;}
+#nameOverlay.hidden{display:none;}
+.name-box{background:#fff;padding:28px 32px;border-radius:10px;width:360px;max-width:92vw;box-shadow:0 12px 40px rgba(0,0,0,.3);}
+.name-box h2{margin:0 0 6px;font-size:19px;color:var(--blue-dark);}
+.name-box p.sub{margin:0 0 18px;font-size:13px;color:#556;}
+.name-box label{display:block;font-size:13px;font-weight:600;margin:10px 0 4px;}
+.name-box input{width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:6px;font-size:14px;user-select:text;}
+.name-box .err{color:var(--red);font-size:12.5px;min-height:18px;margin-top:8px;}
+.name-box button{margin-top:10px;width:100%;padding:11px;background:var(--blue);color:#fff;border:none;border-radius:6px;font-size:15px;font-weight:600;cursor:pointer;}
+.name-box button:hover{background:var(--blue-dark);}
+
+/* ---------- Header ---------- */
+#topbar{position:sticky;top:0;z-index:500;background:#fff;border-bottom:1px solid var(--border);}
+#hlToolbar{display:flex;align-items:center;gap:8px;padding:6px 14px;background:#eef2f7;border-bottom:1px solid var(--border);flex-wrap:wrap;}
+#hlToolbar .lbl{font-size:12.5px;color:#556;margin-right:4px;}
+.hl-btn{width:28px;height:28px;border-radius:50%;border:2px solid transparent;cursor:pointer;}
+.hl-btn[data-c="yellow"]{background:var(--hl-yellow);}
+.hl-btn[data-c="green"]{background:var(--hl-green);}
+.hl-btn[data-c="pink"]{background:var(--hl-pink);}
+.hl-btn.active{border-color:#333;transform:scale(1.15);}
+#eraserBtn{padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:#fff;cursor:pointer;font-size:13px;}
+#eraserBtn.active{background:#333;color:#fff;}
+#penBtn{padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:#fff;cursor:pointer;font-size:13px;}
+#penBtn.active{background:#8a5b00;color:#fff;}
+.pen-color-btn{width:22px;height:22px;border-radius:50%;border:2px solid transparent;cursor:pointer;display:none;vertical-align:middle;}
+.pen-color-btn.show{display:inline-block;}
+.pen-color-btn[data-pc="red"]{background:#e53935;}
+.pen-color-btn[data-pc="blue"]{background:#1e88e5;}
+.pen-color-btn[data-pc="black"]{background:#222;}
+.pen-color-btn.active{border-color:#333;transform:scale(1.15);}
+#penEraserBtn{padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:#fff;cursor:pointer;font-size:13px;display:none;}
+#penEraserBtn.show{display:inline-block;}
+#penEraserBtn.active{background:#333;color:#fff;}
+#dictModeTag{display:none;font-size:12px;color:var(--green);font-weight:700;padding:4px 10px;background:#e6f6ea;border-radius:6px;}
+#dictModeTag.show{display:inline-block;}
+.hl-yellow{background:var(--hl-yellow);}
+.hl-green{background:var(--hl-green);}
+.hl-pink{background:var(--hl-pink);}
+
+#header{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;}
+#tabs{display:flex;gap:6px;}
+.tab-btn{padding:8px 16px;border:1px solid var(--border);background:#f4f6f8;border-radius:6px 6px 0 0;cursor:pointer;font-size:14px;font-weight:600;color:#445;}
+.tab-btn.active{background:var(--blue);color:#fff;border-color:var(--blue);}
+#timerBox{font-size:20px;font-weight:700;padding:6px 14px;border-radius:8px;background:#eef2f7;color:var(--blue-dark);min-width:110px;text-align:center;}
+#timerBox.warn{background:#fff3cd;color:#8a5b00;animation:blink 1s infinite;}
+#timerBox.danger{background:#fbe0de;color:var(--red);animation:blink .5s infinite;}
+@keyframes blink{50%{opacity:.4;}}
+
+/* ---------- Layout ---------- */
+#examArea{display:flex;height:calc(100vh - 128px);}
+.passage-panel{width:50%;overflow-y:auto;padding:18px 22px;border-right:none;background:#fff;}
+#divider{width:6px;cursor:col-resize;background:var(--border);flex-shrink:0;}
+#divider:hover{background:var(--blue);}
+.question-panel{width:50%;overflow-y:auto;padding:18px 22px;background:#fbfcfe;}
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+.passage-title{font-size:19px;font-weight:700;color:var(--blue-dark);margin:4px 0 12px;}
+.passage-instr{font-style:italic;font-size:13px;color:#556;margin-bottom:14px;}
+.passage-panel p{line-height:1.65;margin:0 0 12px;text-align:justify;}
+.subheading{display:inline-block;font-weight:700;color:var(--blue-dark);margin-right:6px;}
+.footnote{font-size:12.5px;color:#667;}
+
+.qgroup{margin-bottom:26px;padding-bottom:18px;border-bottom:1px dashed var(--border);}
+.qgroup:last-child{border-bottom:none;}
+.qgroup h3{font-size:14.5px;margin:0 0 4px;color:var(--blue-dark);}
+.qgroup .instr{font-size:13px;color:#445;margin:0 0 10px;line-height:1.5;}
+.qitem{margin:10px 0;font-size:14px;line-height:1.6;}
+.qnum{display:inline-block;min-width:24px;font-weight:700;color:var(--blue-dark);}
+.opt-row{display:block;margin:4px 0 4px 26px;padding:3px 6px;border-radius:5px;cursor:pointer;}
+.opt-row input{margin-right:8px;}
+.opt-row.selected-answer{background:var(--sel-orange);}
+.opt-row.correct{background:#c8f0d0 !important;}
+.opt-row.incorrect{background:#f8d3d0 !important;}
+select.qselect{padding:5px 6px;border:1px solid var(--border);border-radius:5px;font-size:13.5px;margin-left:6px;min-width:150px;}
+input.qtext{padding:4px 7px;border:1px solid var(--border);border-radius:4px;font-size:13.5px;width:150px;margin:0 3px;}
+input.qtext.correct-cell{background:#c8f0d0;border-color:var(--green);}
+input.qtext.incorrect-cell{background:#f8d3d0;border-color:var(--red);}
+.ans-hint{font-size:12px;color:var(--green);font-weight:600;margin-left:6px;}
+.qnum-inline{display:inline-block;min-width:20px;color:#fff;background:var(--blue);border-radius:4px;font-size:11.5px;text-align:center;padding:1px 4px;margin:0 4px 0 2px;vertical-align:middle;}
+.headinglist, .wordbank, .keylist{background:#eef2f7;border:1px solid var(--border);border-radius:6px;padding:10px 14px;margin-bottom:12px;font-size:13.5px;line-height:1.65;}
+.headinglist div, .wordbank span, .keylist div{margin:2px 0;}
+.wordbank span{display:inline-block;margin-right:16px;}
+table.qtable{width:100%;border-collapse:collapse;margin:10px 0;font-size:13.5px;}
+table.qtable td, table.qtable th{border:1px solid var(--border);padding:7px 9px;vertical-align:top;text-align:left;}
+table.qtable th{background:#eef2f7;}
+.notebox{background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:14px 18px;margin:10px 0;}
+.notebox h4{margin:12px 0 6px;font-size:14px;color:var(--blue-dark);}
+.notebox h4:first-child{margin-top:0;}
+.notebox ul{margin:4px 0 8px;padding-left:20px;}
+.notebox li{margin:4px 0;font-size:13.5px;line-height:1.6;}
+.summarybox{background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:14px 18px;margin:10px 0;font-size:13.5px;line-height:1.85;}
+.summarybox .stitle{font-weight:700;color:var(--blue-dark);display:block;margin-bottom:8px;}
+
+@media (max-width:768px){
+  #examArea{flex-direction:column;height:auto;}
+  .passage-panel, .question-panel{width:100%;height:60vh;}
+  #divider{display:none;}
+  .tab-btn{padding:7px 10px;font-size:12.5px;}
+}
+
+/* ---------- Submit / violation ---------- */
+#submitBtn{position:fixed;right:22px;bottom:22px;z-index:600;background:var(--red);color:#fff;border:none;padding:14px 24px;border-radius:30px;font-size:15px;font-weight:700;box-shadow:0 6px 18px rgba(0,0,0,.25);cursor:pointer;}
+#submitBtn:hover{background:#a80f00;}
+.modal-overlay{position:fixed;inset:0;background:rgba(10,20,40,.65);display:flex;align-items:center;justify-content:center;z-index:9998;}
+.modal-overlay.hidden{display:none;}
+.modal-box{background:#fff;border-radius:10px;padding:24px 26px;width:420px;max-width:92vw;box-shadow:0 12px 40px rgba(0,0,0,.3);}
+.modal-box h3{margin:0 0 10px;color:var(--blue-dark);}
+.modal-actions{display:flex;gap:10px;margin-top:18px;}
+.modal-actions button{flex:1;padding:10px;border-radius:6px;border:none;font-size:14px;font-weight:600;cursor:pointer;}
+.btn-confirm{background:var(--red);color:#fff;}
+.btn-cancel{background:#e4e8ec;color:#333;}
+#resultBox{max-height:70vh;overflow-y:auto;}
+#resultBox table{width:100%;border-collapse:collapse;margin:10px 0;font-size:13.5px;}
+#resultBox td,#resultBox th{border:1px solid var(--border);padding:6px 8px;}
+.band-badge{display:inline-block;background:var(--blue);color:#fff;padding:4px 12px;border-radius:20px;font-weight:700;font-size:15px;}
+#warnBanner{position:fixed;top:0;left:0;right:0;background:var(--red);color:#fff;text-align:center;padding:8px;font-weight:700;z-index:9997;display:none;}
+#fsOverlay{position:fixed;inset:0;background:rgba(10,20,40,.9);color:#fff;display:none;align-items:center;justify-content:center;flex-direction:column;z-index:9996;text-align:center;padding:20px;}
+#fsOverlay button{margin-top:16px;padding:10px 20px;border-radius:6px;border:none;background:var(--blue);color:#fff;font-weight:700;cursor:pointer;font-size:14px;}
+
+/* ---------- Pen (freehand drawing) tool ---------- */
+.passage-panel, .question-panel{position:relative;}
+.draw-layer{position:absolute;top:0;left:0;width:100%;pointer-events:none;z-index:40;}
+.draw-layer.pen-active{pointer-events:auto;cursor:crosshair;}
+.draw-layer.pen-erase{pointer-events:auto;cursor:cell;}
+body.pen-mode .passage-panel, body.pen-mode .question-panel{cursor:crosshair;}
+
+/* ---------- Dictionary popup (post-submit) ---------- */
+.dict-popup{position:fixed;max-width:320px;background:#1b1f23;color:#fff;padding:10px 14px;border-radius:8px;font-size:13px;line-height:1.5;z-index:9995;box-shadow:0 8px 24px rgba(0,0,0,.3);}
+.dict-popup.dict-popup-wide{max-width:480px;}
+.dict-popup b{color:#7fd0ff;}
+.dict-popup .dict-close{position:absolute;top:2px;right:8px;cursor:pointer;color:#aaa;font-size:14px;}
+.dict-popup .dict-body{max-height:56vh;overflow-y:auto;padding-right:4px;}
+.dict-popup .dict-orig{margin-bottom:8px;color:#c9d6e3;}
+.dict-popup .dict-trans{color:#d8ffe0;border-top:1px solid #333;padding-top:8px;}
+.dict-popup .dict-progress{margin-top:8px;color:#ffd166;font-size:12px;font-style:italic;}
+
+/* ---------- Explanation panel (post-submit) ---------- */
+.explain-panel{display:none;margin-top:20px;padding-top:14px;border-top:2px solid var(--blue);}
+.explain-panel h3{color:var(--blue-dark);font-size:15px;margin:0 0 10px;}
+.explain-item{background:#f0f6ff;border:1px solid #cfe0f5;border-radius:6px;padding:8px 12px;margin-bottom:8px;font-size:13px;line-height:1.55;}
+.explain-item b.eq{color:var(--blue-dark);}
+.explain-item .eans{color:var(--green);font-weight:700;}
+.explain-item .etext{color:#334;display:block;margin-top:6px;}
+.explain-item .equote{display:block;margin-top:5px;margin-bottom:2px;font-style:italic;color:#4a5568;background:#fff;border-left:3px solid var(--blue);padding:4px 10px;border-radius:0 4px 4px 0;}
+.explain-item .elang{display:inline-block;font-size:10.5px;font-weight:800;letter-spacing:.03em;color:#fff;background:var(--blue);border-radius:4px;padding:1px 6px;margin-right:6px;vertical-align:middle;}
+.explain-item .etext-vi .elang{background:var(--green);}
+.explain-item .etext-en{font-style:normal;}
+
+</style>
+</head>
+<body>
+
+<div id="nameOverlay">
+  <div class="name-box">
+    <h2>IELTS Reading Test 8</h2>
+    <p class="sub">Vui lòng nhập thông tin để bắt đầu làm bài (thời gian: 60 phút, 40 câu hỏi).</p>
+    <label>Họ và tên</label>
+    <input type="text" id="stuName" placeholder="Nguyễn Văn A">
+    <label>Lớp</label>
+    <input type="text" id="stuClass" placeholder="10A1">
+    <div class="err" id="nameErr"></div>
+    <button onclick="startExam()">Bắt đầu làm bài</button>
+  </div>
+</div>
+
+<div id="warnBanner"></div>
+<div id="fsOverlay">
+  <div>⚠ Bạn đã thoát chế độ toàn màn hình. Vi phạm đã được ghi nhận.</div>
+  <button onclick="enterFullscreen()">Vào toàn màn hình</button>
+</div>
+
+<div id="topbar">
+  <div id="hlToolbar">
+    <span class="lbl">Highlight:</span>
+    <button class="hl-btn" data-c="yellow" title="Vàng"></button>
+    <button class="hl-btn" data-c="green" title="Xanh lá"></button>
+    <button class="hl-btn" data-c="pink" title="Hồng"></button>
+    <button id="eraserBtn" title="Tẩy">🧹 Tẩy</button>
+    <button id="penBtn" title="Bút viết">🖊️ Bút</button>
+    <button class="pen-color-btn" data-pc="red" title="Đỏ"></button>
+    <button class="pen-color-btn" data-pc="blue" title="Xanh dương"></button>
+    <button class="pen-color-btn" data-pc="black" title="Đen"></button>
+    <button id="penEraserBtn" title="Xóa nét bút">🧽 Xóa nét</button>
+    <span id="dictModeTag">📖 Đã mở tra từ: click đúp vào từ hoặc bôi đen đoạn văn để dịch</span>
+  </div>
+  <div id="header">
+    <div id="tabs">
+      <button class="tab-btn active" id="tabBtn-0" onclick="showPassage(0)">Passage 1</button>
+      <button class="tab-btn" id="tabBtn-1" onclick="showPassage(1)">Passage 2</button>
+      <button class="tab-btn" id="tabBtn-2" onclick="showPassage(2)">Passage 3</button>
+    </div>
+    <div id="timerBox">60:00</div>
+  </div>
+</div>
+
+<div id="examArea">
+  <div class="passage-panel tab-content active" id="passage-0">
+<div class="passage-title">The White Horse of Uffington</div>
+<div class="passage-instr">You should spend about 20 minutes on Questions 1-13, which are based on Reading Passage 1 below.</div>
+<p>The cutting of huge figures or 'geoglyphs' into the earth of English hillsides has taken place for more than 3,000 years. There are 56 hill figures scattered around England, with the vast majority on the chalk downlands of the country's southern counties. The figures include giants, horses, crosses and regimental badges. Although the majority of these geoglyphs date within the last 300 years or so, there are one or two that are much older.</p>
+<p>The most famous of these figures is perhaps also the most mysterious - the Uffington White Horse in Oxfordshire. The White Horse has recently been re-dated and shown to be even older than its previously assigned ancient pre-Roman Iron Age date. More controversial is the date of the enigmatic Long Man of Wilmington in Sussex. While many historians are convinced the figure is prehistoric, others believe that it was the work of an artistic monk from a nearby priory and was created between the 11th and 15th centuries.</p>
+<p>The method of cutting these huge figures was simply to remove the overlying grass to reveal the gleaming white chalk below. However, the grass would soon grow over the geoglyph again unless it was regularly cleaned or scoured by a fairly large team of people. One reason that the vast majority of hill figures have disappeared is that when the traditions associated with the figures faded, people no longer bothered or remembered to clear away the grass to expose the chalk outline. Furthermore, over hundreds of years the outlines would sometimes change due to people not always cutting in exactly the same place, thus creating a different shape to the original geoglyph. The fact that any ancient hill figures survive at all in England today is testament to the strength and continuity of local customs and beliefs which, in one case at least, must stretch back over millennia.</p>
+<p>The Uffington White Horse is a unique, stylised representation of a horse consisting of a long, sleek back, thin disjointed legs, a streaming tail, and a bird-like beaked head. The elegant creature almost melts into the landscape. The horse is situated 2.5 km from Uffington village on a steep slope close to the Late Bronze Age (c. 7th century BCE) hillfort of Uffington Castle and below the Ridgeway, a long-distance Neolithic track.</p>
+<p>The Uffington Horse is also surrounded by Bronze Age burial mounds. It is not far from the Bronze Age cemetery of Lambourn Seven Barrows, which consists of more than 30 well-preserved burial mounds. The carving has been placed in such a way as to make it extremely difficult to see from close quarters, and like many geoglyphs is best appreciated from the air. Nevertheless, there are certain areas of the Vale of the White Horse, the valley containing and named after the enigmatic creature, from which an adequate impression may be gained. Indeed, on a clear day the carving can be seen from up to 30 km away.</p>
+<p>The earliest evidence of a horse at Uffington is from the 1070s CE when 'White Horse Hill' is mentioned in documents from the nearby Abbey of Abingdon, and the first reference to the horse itself is soon after, in 1190 CE. However, the carving is believed to date back much further than that. Due to the similarity of the Uffington White Horse to the stylised depictions of horses on 1st century BCE coins, it had been thought that the creature must also date to that period.</p>
+<p>However, in 1995 Optically Stimulated Luminescence (OSL) testing was carried out by the Oxford Archaeological Unit on soil from two of the lower layers of the horse's body, and from another cut near the base. The result was a date for the horse's construction somewhere between 1400 and 600 BCE - in other words, it had a Late Bronze Age or Early Iron Age origin.</p>
+<p>The latter end of this date range would tie the carving of the horse in with occupation of the nearby Uffington hillfort, indicating that it may represent a tribal emblem marking the land of the inhabitants of the hillfort. Alternatively, the carving may have been carried out during a Bronze or Iron Age ritual. Some researchers see the horse as representing the Celtic horse goddess Epona, who was worshipped as a protector of horses, and for her associations with fertility. However, the cult of Epona was not imported from Gaul (France) until around the first century CE. This date is at least six centuries after the Uffington Horse was probably carved. Nevertheless, the horse had great ritual and economic significance during the Bronze and Iron Ages, as attested by its depictions on jewellery and other metal objects. It is possible that the carving represents a goddess in native mythology, such as Rhiannon, described in later Welsh mythology as a beautiful woman dressed in gold and riding a white horse.</p>
+<p>The fact that geoglyphs can disappear easily, along with their associated rituals and meaning, indicates that they were never intended to be anything more than temporary gestures. But this does not lessen their importance. These giant carvings are a fascinating glimpse into the minds of their creators and how they viewed the landscape in which they lived.</p>
+
+  </div>
+  <div id="divider"></div>
+  <div class="question-panel tab-content active" id="questions-0">
+<div class="qgroup">
+<h3>Questions 1-8</h3>
+<div class="instr">Do the following statements agree with the information given in Reading Passage 1?</div>
+<div class="instr">In boxes 1-8 on your answer sheet, write</div>
+<div class="instr">TRUE if the statement agrees with the information</div>
+<div class="instr">FALSE if the statement contradicts the information</div>
+<div class="instr">NOT GIVEN if there is no information on this</div>
+<div class="qitem"><span class="qnum">1.</span> Most geoglyphs in England are located in a particular area of the country.<span id="hint-q1"></span><br>
+<label class="opt-row"><input type="radio" name="q1" value="TRUE"> TRUE</label>
+<label class="opt-row"><input type="radio" name="q1" value="FALSE"> FALSE</label>
+<label class="opt-row"><input type="radio" name="q1" value="NOT GIVEN"> NOT GIVEN</label>
+</div>
+<div class="qitem"><span class="qnum">2.</span> There are more geoglyphs in the shape of a horse than any other creature.<span id="hint-q2"></span><br>
+<label class="opt-row"><input type="radio" name="q2" value="TRUE"> TRUE</label>
+<label class="opt-row"><input type="radio" name="q2" value="FALSE"> FALSE</label>
+<label class="opt-row"><input type="radio" name="q2" value="NOT GIVEN"> NOT GIVEN</label>
+</div>
+<div class="qitem"><span class="qnum">3.</span> A recent dating of the Uffington White Horse indicates that people were mistaken about its age.<span id="hint-q3"></span><br>
+<label class="opt-row"><input type="radio" name="q3" value="TRUE"> TRUE</label>
+<label class="opt-row"><input type="radio" name="q3" value="FALSE"> FALSE</label>
+<label class="opt-row"><input type="radio" name="q3" value="NOT GIVEN"> NOT GIVEN</label>
+</div>
+<div class="qitem"><span class="qnum">4.</span> Historians have come to an agreement about the origins of the Long Man of Wilmington.<span id="hint-q4"></span><br>
+<label class="opt-row"><input type="radio" name="q4" value="TRUE"> TRUE</label>
+<label class="opt-row"><input type="radio" name="q4" value="FALSE"> FALSE</label>
+<label class="opt-row"><input type="radio" name="q4" value="NOT GIVEN"> NOT GIVEN</label>
+</div>
+<div class="qitem"><span class="qnum">5.</span> Geoglyphs were created by people placing white chalk on the hillside.<span id="hint-q5"></span><br>
+<label class="opt-row"><input type="radio" name="q5" value="TRUE"> TRUE</label>
+<label class="opt-row"><input type="radio" name="q5" value="FALSE"> FALSE</label>
+<label class="opt-row"><input type="radio" name="q5" value="NOT GIVEN"> NOT GIVEN</label>
+</div>
+<div class="qitem"><span class="qnum">6.</span> Many geoglyphs in England are no longer visible.<span id="hint-q6"></span><br>
+<label class="opt-row"><input type="radio" name="q6" value="TRUE"> TRUE</label>
+<label class="opt-row"><input type="radio" name="q6" value="FALSE"> FALSE</label>
+<label class="opt-row"><input type="radio" name="q6" value="NOT GIVEN"> NOT GIVEN</label>
+</div>
+<div class="qitem"><span class="qnum">7.</span> The shape of some geoglyphs has been altered over time.<span id="hint-q7"></span><br>
+<label class="opt-row"><input type="radio" name="q7" value="TRUE"> TRUE</label>
+<label class="opt-row"><input type="radio" name="q7" value="FALSE"> FALSE</label>
+<label class="opt-row"><input type="radio" name="q7" value="NOT GIVEN"> NOT GIVEN</label>
+</div>
+<div class="qitem"><span class="qnum">8.</span> The fame of the Uffington White Horse is due to its size.<span id="hint-q8"></span><br>
+<label class="opt-row"><input type="radio" name="q8" value="TRUE"> TRUE</label>
+<label class="opt-row"><input type="radio" name="q8" value="FALSE"> FALSE</label>
+<label class="opt-row"><input type="radio" name="q8" value="NOT GIVEN"> NOT GIVEN</label>
+</div>
+</div>
+<div class="qgroup">
+<h3>Questions 9-13</h3>
+<div class="instr">Complete the notes below.</div>
+<div class="instr">Choose ONE WORD ONLY from the passage for each answer.</div>
+<div class="instr">Write your answers in boxes 9-13 on your answer sheet.</div>
+<div class="notebox"><h4>The Uffington White Horse</h4><h4>The location of the Uffington White Horse:</h4><ul><li>a distance of 2.5 km from Uffington village</li><li>near an ancient road known as the <b class="qnum-inline">9</b><input type="text" class="qtext" id="q9" autocomplete="off"><span id="hint-q9"></span></li><li>close to an ancient cemetery that has a number of burial mounds</li></ul><h4>Dating the Uffington White Horse:</h4><ul><li>first reference to White Horse Hill appears in <b class="qnum-inline">10</b><input type="text" class="qtext" id="q10" autocomplete="off"><span id="hint-q10"></span> from the 1070s</li><li>horses shown on coins from the period 100 BCE - 1 BCE are similar in appearance</li><li>according to analysis of the surrounding <b class="qnum-inline">11</b><input type="text" class="qtext" id="q11" autocomplete="off"><span id="hint-q11"></span>, the Horse is Late Bronze Age / Early Iron Age</li></ul><h4>Possible reasons for creation of the Uffington White Horse:</h4><ul><li>an emblem to indicate land ownership</li><li>formed part of an ancient ritual</li><li>was a representation of goddess Epona - associated with protection of horses and <b class="qnum-inline">12</b><input type="text" class="qtext" id="q12" autocomplete="off"><span id="hint-q12"></span></li><li>was a representation of a Welsh goddess called <b class="qnum-inline">13</b><input type="text" class="qtext" id="q13" autocomplete="off"><span id="hint-q13"></span></li></ul></div></div>
+
+<div class="explain-panel" id="explainPanel-0"><h3>📘 Giải thích chi tiết đáp án</h3><div class="explain-item"><b class="eq">Câu 1.</b> Đáp án đúng: <span class="eans">TRUE</span><span class="equote">&ldquo;There are 56 hill figures scattered around England, with the vast majority on the chalk downlands of the country's southern counties&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Statement 1 says most geoglyphs are concentrated in a particular area. Paragraph 1 confirms the vast majority are found on the chalk downlands of southern England — a specific region — matching the statement, so the answer is TRUE.</span><span class="etext etext-vi"><b class="elang">VI:</b> Câu 1 nói hầu hết geoglyph tập trung ở một khu vực cụ thể. Đoạn 1 xác nhận phần lớn nằm trên vùng đất phấn (chalk downlands) ở các quận phía nam nước Anh — một khu vực cụ thể — khớp với câu hỏi → đáp án TRUE.</span></div><div class="explain-item"><b class="eq">Câu 2.</b> Đáp án đúng: <span class="eans">NOT GIVEN</span><span class="equote">&ldquo;The figures include giants, horses, crosses and regimental badges&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Statement 2 claims horse-shaped geoglyphs outnumber all other shapes. The passage only lists the types of figures (giants, horses, crosses, badges) without giving any count comparison between them — so the answer is NOT GIVEN.</span><span class="etext etext-vi"><b class="elang">VI:</b> Câu 2 nói geoglyph hình ngựa nhiều hơn bất kỳ hình dạng nào khác. Bài chỉ liệt kê các loại hình (khổng lồ, ngựa, chữ thập, huy hiệu) mà không hề so sánh số lượng giữa chúng → đáp án NOT GIVEN.</span></div><div class="explain-item"><b class="eq">Câu 3.</b> Đáp án đúng: <span class="eans">TRUE</span><span class="equote">&ldquo;The White Horse has recently been re-dated and shown to be even older than its previously assigned ancient pre-Roman Iron Age date&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Statement 3 says a recent dating shows people were wrong about the horse's age. Paragraph 2 confirms it was re-dated and found 'even older' than previously believed — meaning the earlier estimate was indeed mistaken — matching the statement, so the answer is TRUE.</span><span class="etext etext-vi"><b class="elang">VI:</b> Câu 3 nói việc xác định niên đại gần đây cho thấy người ta đã nhầm về tuổi của công trình. Đoạn 2 xác nhận nó được xác định lại niên đại và phát hiện 'even older' (còn cổ hơn) so với suy nghĩ trước đó — nghĩa là ước tính trước đây thực sự sai — khớp với câu hỏi → đáp án TRUE.</span></div><div class="explain-item"><b class="eq">Câu 4.</b> Đáp án đúng: <span class="eans">FALSE</span><span class="equote">&ldquo;While many historians are convinced the figure is prehistoric, others believe that it was the work of an artistic monk... created between the 11th and 15th centuries&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Statement 4 says historians agree about the Long Man's origins. Paragraph 2 explicitly shows a disagreement — some think prehistoric, others think it's medieval — this contradicts the statement, so the answer is FALSE.</span><span class="etext etext-vi"><b class="elang">VI:</b> Câu 4 nói các nhà sử học đã đồng thuận về nguồn gốc của Long Man of Wilmington. Đoạn 2 cho thấy rõ sự BẤT ĐỒNG — một số cho là thời tiền sử, một số khác cho là thời trung cổ — trái ngược với câu hỏi → đáp án FALSE.</span></div><div class="explain-item"><b class="eq">Câu 5.</b> Đáp án đúng: <span class="eans">FALSE</span><span class="equote">&ldquo;The method of cutting these huge figures was simply to remove the overlying grass to reveal the gleaming white chalk below&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Statement 5 says geoglyphs were created by placing white chalk on the hillside. Paragraph 3 says the opposite — grass was REMOVED to reveal chalk already underneath, not chalk being added — this contradicts the statement, so the answer is FALSE.</span><span class="etext etext-vi"><b class="elang">VI:</b> Câu 5 nói geoglyph được tạo bằng cách đặt đá phấn trắng lên đồi. Đoạn 3 nói ngược lại — cỏ bị LOẠI BỎ để lộ ra lớp đá phấn đã có sẵn bên dưới, không phải đá phấn được thêm vào — trái ngược với câu hỏi → đáp án FALSE.</span></div><div class="explain-item"><b class="eq">Câu 6.</b> Đáp án đúng: <span class="eans">TRUE</span><span class="equote">&ldquo;One reason that the vast majority of hill figures have disappeared is that when the traditions associated with the figures faded, people no longer bothered or remembered to clear away the grass&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Statement 6 says many English geoglyphs are no longer visible. Paragraph 3 confirms most hill figures have 'disappeared' because they stopped being maintained — matching the statement, so the answer is TRUE.</span><span class="etext etext-vi"><b class="elang">VI:</b> Câu 6 nói nhiều geoglyph ở Anh không còn nhìn thấy được nữa. Đoạn 3 xác nhận hầu hết các hình khắc trên đồi đã 'disappeared' (biến mất) vì không còn được duy trì — khớp với câu hỏi → đáp án TRUE.</span></div><div class="explain-item"><b class="eq">Câu 7.</b> Đáp án đúng: <span class="eans">TRUE</span><span class="equote">&ldquo;over hundreds of years the outlines would sometimes change due to people not always cutting in exactly the same place, thus creating a different shape to the original geoglyph&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Statement 7 says the shape of some geoglyphs changed over time. Paragraph 3 confirms outlines sometimes changed because people didn't always cut in the same spot — matching the statement, so the answer is TRUE.</span><span class="etext etext-vi"><b class="elang">VI:</b> Câu 7 nói hình dạng của một số geoglyph đã bị thay đổi qua thời gian. Đoạn 3 xác nhận đường viền đôi khi thay đổi vì người ta không luôn cắt đúng vị trí cũ — khớp với câu hỏi → đáp án TRUE.</span></div><div class="explain-item"><b class="eq">Câu 8.</b> Đáp án đúng: <span class="eans">NOT GIVEN</span><span class="equote">&ldquo;The most famous of these figures is perhaps also the most mysterious - the Uffington White Horse&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Statement 8 says the Uffington White Horse's fame comes from its size. The passage calls it famous and mysterious but never attributes its fame to its size — so the answer is NOT GIVEN.</span><span class="etext etext-vi"><b class="elang">VI:</b> Câu 8 nói sự nổi tiếng của Uffington White Horse là do kích thước của nó. Bài chỉ gọi nó là nổi tiếng và bí ẩn nhưng không hề nói sự nổi tiếng đó là vì kích thước → đáp án NOT GIVEN.</span></div><div class="explain-item"><b class="eq">Câu 9.</b> Đáp án đúng: <span class="eans">Ridgeway</span><span class="equote">&ldquo;below the Ridgeway, a long-distance Neolithic track&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Paragraph 4 names the ancient track near the horse as the 'Ridgeway' — this matches the note 'near an ancient road known as the ___' → answer 'Ridgeway'.</span><span class="etext etext-vi"><b class="elang">VI:</b> Đoạn 4 gọi tên con đường cổ gần bức tranh ngựa là 'Ridgeway' — khớp với ô 'near an ancient road known as the ___' → đáp án 'Ridgeway'.</span></div><div class="explain-item"><b class="eq">Câu 10.</b> Đáp án đúng: <span class="eans">documents</span><span class="equote">&ldquo;'White Horse Hill' is mentioned in documents from the nearby Abbey of Abingdon&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Paragraph 6 says the earliest reference appears in 'documents' from Abingdon Abbey — this matches the note 'first reference... appears in ___ from the 1070s' → answer 'documents'.</span><span class="etext etext-vi"><b class="elang">VI:</b> Đoạn 6 nói tài liệu tham khảo sớm nhất xuất hiện trong 'documents' (văn bản) từ Tu viện Abingdon — khớp với ô 'first reference... appears in ___ from the 1070s' → đáp án 'documents'.</span></div><div class="explain-item"><b class="eq">Câu 11.</b> Đáp án đúng: <span class="eans">soil</span><span class="equote">&ldquo;OSL testing was carried out by the Oxford Archaeological Unit on soil from two of the lower layers of the horse's body&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Paragraph 7 says the dating test was carried out on 'soil' samples — this matches the note 'according to analysis of the surrounding ___, the Horse is...' → answer 'soil'.</span><span class="etext etext-vi"><b class="elang">VI:</b> Đoạn 7 nói việc thử nghiệm niên đại được thực hiện trên các mẫu 'soil' (đất) — khớp với ô 'according to analysis of the surrounding ___, the Horse is...' → đáp án 'soil'.</span></div><div class="explain-item"><b class="eq">Câu 12.</b> Đáp án đúng: <span class="eans">fertility</span><span class="equote">&ldquo;the Celtic horse goddess Epona, who was worshipped as a protector of horses, and for her associations with fertility&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Paragraph 8 says Epona was associated with 'fertility' as well as protecting horses — this matches the note 'associated with protection of horses and ___' → answer 'fertility'.</span><span class="etext etext-vi"><b class="elang">VI:</b> Đoạn 8 nói Epona gắn liền với 'fertility' (khả năng sinh sản) bên cạnh việc bảo vệ ngựa — khớp với ô 'associated with protection of horses and ___' → đáp án 'fertility'.</span></div><div class="explain-item"><b class="eq">Câu 13.</b> Đáp án đúng: <span class="eans">Rhiannon</span><span class="equote">&ldquo;It is possible that the carving represents a goddess in native mythology, such as Rhiannon, described in later Welsh mythology as a beautiful woman dressed in gold and riding a white horse&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Paragraph 8 names 'Rhiannon' as the Welsh goddess the carving might represent — this matches the note 'was a representation of a Welsh goddess called ___' → answer 'Rhiannon'.</span><span class="etext etext-vi"><b class="elang">VI:</b> Đoạn 8 nêu tên 'Rhiannon' là nữ thần Wales mà bức tranh có thể đại diện — khớp với ô 'was a representation of a Welsh goddess called ___' → đáp án 'Rhiannon'.</span></div></div>
+  </div>
+  <div class="passage-panel tab-content" id="passage-1">
+<div class="passage-title">A second attempt at domesticating the tomato</div>
+<div class="passage-instr">You should spend about 20 minutes on Questions 14-26 which are based on Reading Passage 2 below.</div>
+<p><span class="subheading">A</span></p>
+<p>It took at least 3,000 years for humans to learn how to domesticate the wild tomato and cultivate it for food. Now two separate teams in Brazil and China have done it all over again in less than three years. And they have done it better in some ways, as the re-domesticated tomatoes are more nutritious than the ones we eat at present.</p>
+<p>This approach relies on the revolutionary CRISPR genome editing technique, in which changes are deliberately made to the DNA of a living cell, allowing genetic material to be added, removed or altered. The technique could not only improve existing crops, but could also be used to turn thousands of wild plants into useful and appealing foods. In fact, a third team in the US has already begun to do this with a relative of the tomato called the groundcherry.</p>
+<p>This fast-track domestication could help make the world's food supply healthier and far more resistant to diseases, such as the rust fungus devastating wheat crops.</p>
+<p>'This could transform what we eat,' says Jorg Kudla at the University of Munster in Germany, a member of the Brazilian team. 'There are 50,000 edible plants in the world, but 90 percent of our energy comes from just 15 crops.'</p>
+<p>'We can now mimic the known domestication course of major crops like rice, maize, sorghum or others,' says Caixia Gao of the Chinese Academy of Sciences in Beijing. 'Then we might try to domesticate plants that have never been domesticated.'</p>
+<p><span class="subheading">B</span></p>
+<p>Wild tomatoes, which are native to the Andes region in South America, produce pea-sized fruits. Over many generations, peoples such as the Aztecs and Incas transformed the plant by selecting and breeding plants with mutations* in their genetic structure, which resulted in desirable traits such as larger fruit.</p>
+<p>But every time a single plant with a mutation is taken from a larger population for breeding, much genetic diversity is lost. And sometimes the desirable mutations come with less desirable traits. For instance, the tomato strains grown for supermarkets have lost much of their flavour.</p>
+<p>By comparing the genomes of modern plants to those of their wild relatives, biologists have been working out what genetic changes occurred as plants were domesticated. The teams in Brazil and China have now used this knowledge to reintroduce these changes from scratch while maintaining or even enhancing the desirable traits of wild strains.</p>
+<p><span class="subheading">C</span></p>
+<p>Kudla's team made six changes altogether. For instance, they tripled the size of fruit by editing a gene called FRUIT WEIGHT, and increased the number of tomatoes per truss by editing another called MULTIFLORA.</p>
+<p>While the historical domestication of tomatoes reduced levels of the red pigment lycopene - thought to have potential health benefits - the team in Brazil managed to boost it instead. The wild tomato has twice as much lycopene as cultivated ones; the newly domesticated one has five times as much.</p>
+<p>'They are quite tasty,' says Kudla. 'A little bit strong. And very aromatic.'</p>
+<p>The team in China re-domesticated several strains of wild tomatoes with desirable traits lost in domesticated tomatoes. In this way they managed to create a strain resistant to a common disease called bacterial spot race, which can devastate yields. They also created another strain that is more salt tolerant - and has higher levels of vitamin C.</p>
+<p><span class="subheading">D</span></p>
+<p>Meanwhile, Joyce Van Eck at the Boyce Thompson Institute in New York state decided to use the same approach to domesticate the groundcherry or goldenberry (Physalis pruinosa) for the first time. This fruit looks similar to the closely related Cape gooseberry (Physalis peruviana).</p>
+<p>Groundcherries are already sold to a limited extent in the US but they are hard to produce because the plant has a sprawling growth habit and the small fruits fall off the branches when ripe. Van Eck's team has edited the plants to increase fruit size, make their growth more compact and to stop fruits dropping. 'There's potential for this to be a commercial crop,' says Van Eck. But she adds that taking the work further would be expensive because of the need to pay for a licence for the CRISPR technology and get regulatory approval.</p>
+<p><span class="subheading">E</span></p>
+<p>This approach could boost the use of many obscure plants, says Jonathan Jones of the Sainsbury Lab in the UK. But it will be hard for new foods to grow so popular with farmers and consumers that they become new staple crops, he thinks.</p>
+<p>The three teams already have their eye on other plants that could be 'catapulted into the mainstream', including foxtail, oat-grass and cowpea. By choosing wild plants that are drought or heat tolerant, says Gao, we could create crops that will thrive even as the planet warms.</p>
+<p>But Kudla didn't want to reveal which species were in his team's sights, because CRISPR has made the process so easy. 'Any one with the right skills could go to their lab and do this.'</p>
+<p class="footnote">* mutations: changes in an organism's genetic structure that can be passed down to later generations</p>
+
+  </div>
+  <div class="question-panel tab-content" id="questions-1">
+<div class="qgroup">
+<h3>Questions 14-18</h3>
+<div class="instr">Reading Passage 2 has five paragraphs, A-E.</div>
+<div class="instr">Which section contains the following information?</div>
+<div class="instr">Write the correct letter, A-E, in boxes 14-18 on your answer sheet.</div>
+<div class="instr">NB You may use any letter more than once.</div>
+<div class="qitem"><span class="qnum">14.</span> a reference to a type of tomato that can resist a dangerous infection. <select class="qselect" id="q14"><option value="">-- chọn --</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option></select></div>
+<div class="qitem"><span class="qnum">15.</span> an explanation of how problems can arise from focusing only on a certain type of tomato plant. <select class="qselect" id="q15"><option value="">-- chọn --</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option></select></div>
+<div class="qitem"><span class="qnum">16.</span> a number of examples of plants that are not cultivated at present but could be useful as food sources. <select class="qselect" id="q16"><option value="">-- chọn --</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option></select></div>
+<div class="qitem"><span class="qnum">17.</span> a comparison between the early domestication of the tomato and more recent research <select class="qselect" id="q17"><option value="">-- chọn --</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option></select></div>
+<div class="qitem"><span class="qnum">18.</span> a personal reaction to the flavour of a tomato that has been genetically edited <select class="qselect" id="q18"><option value="">-- chọn --</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option></select></div>
+</div>
+<div class="qgroup">
+<h3>Questions 19-23</h3>
+<div class="instr">Look at the following statements (Questions 19-23) and the list of researchers below.</div>
+<div class="instr">Match each statement with the correct researcher, A-D.</div>
+<div class="instr">Write the correct letter, A-D, in boxes 19-23 on your answer sheet.</div>
+<div class="instr">NB You may use any letter more than once.</div>
+<div class="keylist"><b>List of People</b>
+<div>A  Jorg Kudla</div>
+<div>B  Caixia Gao</div>
+<div>C  Joyce Van Eck</div>
+<div>D  Jonathan Jones</div>
+</div>
+<div class="qitem"><span class="qnum">19.</span> Domestication of certain plants could allow them to adapt to future environmental challenges. <select class="qselect" id="q19"><option value="">-- chọn --</option><option value="A">Jorg Kudla</option><option value="B">Caixia Gao</option><option value="C">Joyce Van Eck</option><option value="D">Jonathan Jones</option></select></div>
+<div class="qitem"><span class="qnum">20.</span> The idea of growing and eating unusual plants may not be accepted on a large scale. <select class="qselect" id="q20"><option value="">-- chọn --</option><option value="A">Jorg Kudla</option><option value="B">Caixia Gao</option><option value="C">Joyce Van Eck</option><option value="D">Jonathan Jones</option></select></div>
+<div class="qitem"><span class="qnum">21.</span> It is not advisable for the future direction of certain research to be made public. <select class="qselect" id="q21"><option value="">-- chọn --</option><option value="A">Jorg Kudla</option><option value="B">Caixia Gao</option><option value="C">Joyce Van Eck</option><option value="D">Jonathan Jones</option></select></div>
+<div class="qitem"><span class="qnum">22.</span> Present efforts to domesticate one wild fruit are limited by the costs involved. <select class="qselect" id="q22"><option value="">-- chọn --</option><option value="A">Jorg Kudla</option><option value="B">Caixia Gao</option><option value="C">Joyce Van Eck</option><option value="D">Jonathan Jones</option></select></div>
+<div class="qitem"><span class="qnum">23.</span> Humans only make use of a small proportion of the plant food available on Earth. <select class="qselect" id="q23"><option value="">-- chọn --</option><option value="A">Jorg Kudla</option><option value="B">Caixia Gao</option><option value="C">Joyce Van Eck</option><option value="D">Jonathan Jones</option></select></div>
+</div>
+<div class="qgroup">
+<h3>Questions 24-26</h3>
+<div class="instr">Complete the sentences below.</div>
+<div class="instr">Choose ONE WORD ONLY from the passage for each answer.</div>
+<div class="instr">Write your answers in boxes 24-26 on your answer sheet.</div>
+<div class="qitem"><span class="qnum">24.</span> An undesirable trait such as loss of <input type="text" class="qtext" id="q24" autocomplete="off"> may be caused by a mutation in a tomato gene.<span id="hint-q24"></span></div>
+<div class="qitem"><span class="qnum">25.</span> By modifying one gene in a tomato plant, researchers made the tomato three times its original <input type="text" class="qtext" id="q25" autocomplete="off"> .<span id="hint-q25"></span></div>
+<div class="qitem"><span class="qnum">26.</span> A type of tomato which was not badly affected by <input type="text" class="qtext" id="q26" autocomplete="off"> , and was rich in vitamin C, was produced by a team of researchers in China.<span id="hint-q26"></span></div>
+</div>
+
+<div class="explain-panel" id="explainPanel-1"><h3>📘 Giải thích chi tiết đáp án</h3><div class="explain-item"><b class="eq">Câu 14.</b> Đáp án đúng: <span class="eans">C</span><span class="equote">&ldquo;they managed to create a strain resistant to a common disease called bacterial spot race, which can devastate yields&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Paragraph C mentions a tomato strain resistant to 'bacterial spot race' disease — a dangerous infection — this matches 'a reference to a type of tomato that can resist a dangerous infection' → answer paragraph C.</span><span class="etext etext-vi"><b class="elang">VI:</b> Đoạn C nhắc đến một giống cà chua có khả năng chống lại bệnh 'bacterial spot race' — một loại nhiễm khuẩn nguy hiểm — khớp với câu hỏi 'a reference to a type of tomato that can resist a dangerous infection' → đáp án đoạn C.</span></div><div class="explain-item"><b class="eq">Câu 15.</b> Đáp án đúng: <span class="eans">B</span><span class="equote">&ldquo;every time a single plant with a mutation is taken from a larger population for breeding, much genetic diversity is lost. And sometimes the desirable mutations come with less desirable traits&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Paragraph B explains that focusing breeding on a single mutated plant causes loss of genetic diversity and unwanted side-effects (like loss of flavour) — this matches 'an explanation of how problems can arise from focusing only on a certain type of tomato plant' → answer paragraph B.</span><span class="etext etext-vi"><b class="elang">VI:</b> Đoạn B giải thích rằng việc chỉ tập trung nhân giống từ một cây đột biến duy nhất làm mất đa dạng di truyền và gây ra tác dụng phụ không mong muốn (như mất vị ngon) — khớp với câu hỏi 'an explanation of how problems can arise from focusing only on a certain type of tomato plant' → đáp án đoạn B.</span></div><div class="explain-item"><b class="eq">Câu 16.</b> Đáp án đúng: <span class="eans">E</span><span class="equote">&ldquo;The three teams already have their eye on other plants that could be 'catapulted into the mainstream', including foxtail, oat-grass and cowpea&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Paragraph E lists foxtail, oat-grass and cowpea as examples of currently uncultivated plants with food potential — this matches 'a number of examples of plants that are not cultivated at present but could be useful as food sources' → answer paragraph E.</span><span class="etext etext-vi"><b class="elang">VI:</b> Đoạn E liệt kê cỏ đuôi chồn (foxtail), cỏ yến mạch (oat-grass) và đậu cowpea như các ví dụ về cây hiện chưa được trồng nhưng có tiềm năng làm thực phẩm — khớp với câu hỏi 'a number of examples of plants that are not cultivated at present but could be useful as food sources' → đáp án đoạn E.</span></div><div class="explain-item"><b class="eq">Câu 17.</b> Đáp án đúng: <span class="eans">A</span><span class="equote">&ldquo;It took at least 3,000 years for humans to learn how to domesticate the wild tomato... Now two separate teams in Brazil and China have done it all over again in less than three years&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Paragraph A directly compares the 3,000 years it took to originally domesticate the tomato with the less-than-3-year process achieved by modern CRISPR research — this matches 'a comparison between the early domestication of the tomato and more recent research' → answer paragraph A.</span><span class="etext etext-vi"><b class="elang">VI:</b> Đoạn A so sánh trực tiếp 3.000 năm để thuần hóa cà chua ban đầu với quá trình chưa đến 3 năm đạt được nhờ nghiên cứu CRISPR hiện đại — khớp với câu hỏi 'a comparison between the early domestication of the tomato and more recent research' → đáp án đoạn A.</span></div><div class="explain-item"><b class="eq">Câu 18.</b> Đáp án đúng: <span class="eans">C</span><span class="equote">&ldquo;'They are quite tasty,' says Kudla. 'A little bit strong. And very aromatic.'&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Paragraph C gives Kudla's personal comment on the taste of the genetically edited tomato ('quite tasty... strong... aromatic') — this matches 'a personal reaction to the flavour of a tomato that has been genetically edited' → answer paragraph C.</span><span class="etext etext-vi"><b class="elang">VI:</b> Đoạn C đưa ra nhận xét cá nhân của Kudla về vị của quả cà chua đã chỉnh sửa gen ('quite tasty... strong... aromatic' - khá ngon, hơi đậm, rất thơm) — khớp với câu hỏi 'a personal reaction to the flavour of a tomato that has been genetically edited' → đáp án đoạn C.</span></div><div class="explain-item"><b class="eq">Câu 19.</b> Đáp án đúng: <span class="eans">B</span><span class="equote">&ldquo;By choosing wild plants that are drought or heat tolerant, says Gao, we could create crops that will thrive even as the planet warms&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Gao (paragraph E) says choosing drought/heat-tolerant plants could create crops that thrive as the planet warms — this matches 'Domestication of certain plants could allow them to adapt to future environmental challenges' → answer B.</span><span class="etext etext-vi"><b class="elang">VI:</b> Gao (đoạn E) nói việc chọn các loài cây chịu hạn/chịu nóng có thể tạo ra giống cây phát triển tốt khi hành tinh nóng lên — khớp với câu hỏi 'Domestication of certain plants could allow them to adapt to future environmental challenges' → đáp án B.</span></div><div class="explain-item"><b class="eq">Câu 20.</b> Đáp án đúng: <span class="eans">D</span><span class="equote">&ldquo;it will be hard for new foods to grow so popular with farmers and consumers that they become new staple crops, he thinks&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Jonathan Jones (paragraph E) thinks it will be hard for unusual new foods to become widely popular staple crops — this matches 'The idea of growing and eating unusual plants may not be accepted on a large scale' → answer D.</span><span class="etext etext-vi"><b class="elang">VI:</b> Jonathan Jones (đoạn E) nghĩ rằng sẽ khó để các loại thực phẩm mới trở nên phổ biến rộng rãi thành cây lương thực chính — khớp với câu hỏi 'The idea of growing and eating unusual plants may not be accepted on a large scale' → đáp án D.</span></div><div class="explain-item"><b class="eq">Câu 21.</b> Đáp án đúng: <span class="eans">A</span><span class="equote">&ldquo;Kudla didn't want to reveal which species were in his team's sights, because CRISPR has made the process so easy&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Kudla (paragraph E) refused to reveal his team's future research targets because CRISPR makes copying the work too easy — this matches 'It is not advisable for the future direction of certain research to be made public' → answer A.</span><span class="etext etext-vi"><b class="elang">VI:</b> Kudla (đoạn E) từ chối công bố các loài mà nhóm ông đang nhắm tới vì CRISPR khiến việc sao chép quá dễ dàng — khớp với câu hỏi 'It is not advisable for the future direction of certain research to be made public' → đáp án A.</span></div><div class="explain-item"><b class="eq">Câu 22.</b> Đáp án đúng: <span class="eans">C</span><span class="equote">&ldquo;she adds that taking the work further would be expensive because of the need to pay for a licence for the CRISPR technology and get regulatory approval&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Van Eck (paragraph D) says further groundcherry research would be expensive due to licensing and approval costs — this matches 'Present efforts to domesticate one wild fruit are limited by the costs involved' → answer C.</span><span class="etext etext-vi"><b class="elang">VI:</b> Van Eck (đoạn D) nói việc nghiên cứu tiếp về quả groundcherry sẽ tốn kém do chi phí cấp phép công nghệ và phê duyệt quy định — khớp với câu hỏi 'Present efforts to domesticate one wild fruit are limited by the costs involved' → đáp án C.</span></div><div class="explain-item"><b class="eq">Câu 23.</b> Đáp án đúng: <span class="eans">A</span><span class="equote">&ldquo;'There are 50,000 edible plants in the world, but 90 percent of our energy comes from just 15 crops.'&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Kudla (paragraph A) says only 15 crops provide 90% of our energy despite 50,000 edible plants existing — a tiny fraction of available plant food is used — this matches 'Humans only make use of a small proportion of the plant food available on Earth' → answer A.</span><span class="etext etext-vi"><b class="elang">VI:</b> Kudla (đoạn A) nói chỉ 15 loại cây trồng cung cấp 90% năng lượng của chúng ta dù có tới 50.000 loại cây ăn được — chỉ một phần nhỏ thực phẩm từ cây được sử dụng — khớp với câu hỏi 'Humans only make use of a small proportion of the plant food available on Earth' → đáp án A.</span></div><div class="explain-item"><b class="eq">Câu 24.</b> Đáp án đúng: <span class="eans">flavour / flavor</span><span class="equote">&ldquo;For instance, the tomato strains grown for supermarkets have lost much of their flavour&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Paragraph B gives loss of 'flavour' as an example of an undesirable trait accompanying a desirable mutation — this matches 'An undesirable trait such as loss of ___' → answer 'flavour'.</span><span class="etext etext-vi"><b class="elang">VI:</b> Đoạn B đưa ra việc mất 'flavour' (vị ngon) là ví dụ về đặc điểm không mong muốn đi kèm với đột biến mong muốn — khớp với ô 'An undesirable trait such as loss of ___' → đáp án 'flavour'.</span></div><div class="explain-item"><b class="eq">Câu 25.</b> Đáp án đúng: <span class="eans">size</span><span class="equote">&ldquo;they tripled the size of fruit by editing a gene called FRUIT WEIGHT&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Paragraph C says editing the FRUIT WEIGHT gene tripled fruit 'size' — this matches 'made the tomato three times its original ___' → answer 'size'.</span><span class="etext etext-vi"><b class="elang">VI:</b> Đoạn C nói việc chỉnh sửa gen FRUIT WEIGHT làm tăng gấp ba 'size' (kích thước) quả — khớp với ô 'made the tomato three times its original ___' → đáp án 'size'.</span></div><div class="explain-item"><b class="eq">Câu 26.</b> Đáp án đúng: <span class="eans">salt</span><span class="equote">&ldquo;They also created another strain that is more salt tolerant - and has higher levels of vitamin C&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Paragraph C says the Chinese team created a strain more tolerant of 'salt' and rich in vitamin C — this matches 'not badly affected by ___, and was rich in vitamin C' → answer 'salt'.</span><span class="etext etext-vi"><b class="elang">VI:</b> Đoạn C nói nhóm Trung Quốc tạo ra một giống chịu 'salt' (mặn) tốt hơn và giàu vitamin C — khớp với ô 'not badly affected by ___, and was rich in vitamin C' → đáp án 'salt'.</span></div></div>
+  </div>
+  <div class="passage-panel tab-content" id="passage-2">
+<div class="passage-title">An ideal city</div>
+<div class="passage-instr">You should spend about 20 minutes on Questions 27-40, which are based on Reading Passage 3 below.</div>
+<p>Leonardo da Vinci's ideal city was centuries ahead of its time</p>
+<p>The word 'genius' is universally associated with the name of Leonardo da Vinci. A true Renaissance man, he embodied scientific spirit, artistic talent and humanist sensibilities. Five hundred years have passed since Leonardo died in his home at Château du Clos Lucé, outside Tours, France. Yet far from fading into insignificance, his thinking has carried down the centuries and still surprises today.</p>
+<p>The Renaissance marked the transition from the 15th century to modernity and took place after the spread of the plague in the 14th century, which caused a global crisis resulting in some 200 million deaths across Europe and Asia. Today, the world is on the cusp of a climate crisis, which is predicted to cause widespread displacement, extinctions and death, if left unaddressed. Then, as now, radical solutions were called for to revolutionise the way people lived and safeguard humanity against catastrophe.</p>
+<p>Around 1486 - after a pestilence that killed half the population in Milan, Italy - Leonardo turned his thoughts to urban planning problems. Following a typical Renaissance trend, he began to work on an 'ideal city' project, which - due to its excessive costs - would remain unfulfilled. Yet given that unsustainable urban models are a key cause of global climate change today, it's only natural to wonder how Leonardo might have changed the shape of modern cities.</p>
+<p>Although the Renaissance is renowned as an era of incredible progress in art and architecture, it is rarely noted that the 15th century also marked the birth of urbanism as a true academic discipline. The rigour and method behind the conscious conception of a city had been largely missing in Western thought until the moment when prominent Renaissance men pushed forward large-scale urban projects in Italy, such as the reconfiguration of the town of Pienza and the expansion of the city of Ferrara. These works surely inspired Leonardo's decision to rethink the design of medieval cities, with their winding and overcrowded streets and with houses piled against one another.</p>
+<p>It is not easy to identify a coordinated vision of Leonardo's ideal city because of his disordered way of working with notes and sketches. But from the largest collection of Leonardo's papers ever assembled, a series of innovative thoughts can be reconstructed regarding the foundation of a new city along the Ticino River, which runs from Switzerland into Italy and is 248 kilometres long. He designed the city for the easy transport of goods and clean urban spaces, and he wanted a comfortable and spacious city, with well-ordered streets and architecture. He recommended 'high, strong walls', with 'towers and battlements of all necessary and pleasant beauty'.</p>
+<p>His plans for a modern and 'rational' city were consistent with Renaissance ideals. But, in keeping with his personality, Leonardo included several innovations in his urban design. Leonardo wanted the city to be built on several levels, linked with vertical outdoor staircases. This design can be seen in some of today's high-rise buildings but was unconventional at the time. Indeed, this idea of taking full advantage of the interior spaces wasn't implemented until the 1920s and 1930s, with the birth of the Modernist movement.</p>
+<p>While in the upper layers of the city, people could walk undisturbed between elegant palaces and streets, the lower layer was the place for services, trade, transport and industry. But the true originality of Leonardo's vision was its fusion of architecture and engineering. Leonardo designed extensive hydraulic plants to create artificial canals throughout the city. The canals, regulated by clocks and basins, were supposed to make it easier for boats to navigate inland. Leonardo also thought that the width of the streets ought to match the average height of the adjacent houses: a rule still followed in many contemporary cities across Italy, to allow access to sun and reduce the risk of damage from earthquakes.</p>
+<p>Although some of these features existed in Roman cities, before Leonardo's drawings there had never been a multi-level, compact modern city which was thoroughly technically conceived. Indeed, it wasn't until the 19th century that some of his ideas were applied. For example, the subdivision of the city by function - with services and infrastructures located in the lower levels and wide and well-ventilated boulevards and walkways above for residents - is an idea that can be found in Georges-Eugène Haussmann's renovation of Paris under Emperor Napoleon III between 1853 and 1870.</p>
+<p>Today, Leonardo's ideas are not simply valid, they actually suggest a way forward for urban planning. Many scholars think that the compact city, built upwards instead of outwards, integrated with nature (especially water systems), with efficient transport infrastructure, could help modern cities become more efficient and sustainable. This is yet another reason why Leonardo was aligned so closely with modern urban planning and centuries ahead of his time.</p>
+
+  </div>
+  <div class="question-panel tab-content" id="questions-2">
+<div class="qgroup">
+<h3>Questions 27-33</h3>
+<div class="instr">Do the following statements agree with the information given in Reading Passage 3?</div>
+<div class="instr">In boxes 27-33 on your answer sheet, write</div>
+<div class="instr">TRUE if the statement agrees with the information</div>
+<div class="instr">FALSE if the statement contradicts the information</div>
+<div class="instr">NOT GIVEN if there is no information on this</div>
+<div class="qitem"><span class="qnum">27.</span> People first referred to Leonardo da Vinci as a genius 500 years ago.<span id="hint-q27"></span><br>
+<label class="opt-row"><input type="radio" name="q27" value="TRUE"> TRUE</label>
+<label class="opt-row"><input type="radio" name="q27" value="FALSE"> FALSE</label>
+<label class="opt-row"><input type="radio" name="q27" value="NOT GIVEN"> NOT GIVEN</label>
+</div>
+<div class="qitem"><span class="qnum">28.</span> The current climate crisis is predicted to cause more deaths than the plague.<span id="hint-q28"></span><br>
+<label class="opt-row"><input type="radio" name="q28" value="TRUE"> TRUE</label>
+<label class="opt-row"><input type="radio" name="q28" value="FALSE"> FALSE</label>
+<label class="opt-row"><input type="radio" name="q28" value="NOT GIVEN"> NOT GIVEN</label>
+</div>
+<div class="qitem"><span class="qnum">29.</span> Some of the challenges we face today can be compared to those of earlier times.<span id="hint-q29"></span><br>
+<label class="opt-row"><input type="radio" name="q29" value="TRUE"> TRUE</label>
+<label class="opt-row"><input type="radio" name="q29" value="FALSE"> FALSE</label>
+<label class="opt-row"><input type="radio" name="q29" value="NOT GIVEN"> NOT GIVEN</label>
+</div>
+<div class="qitem"><span class="qnum">30.</span> Leonardo da Vinci's 'ideal city' was constructed in the 15th century.<span id="hint-q30"></span><br>
+<label class="opt-row"><input type="radio" name="q30" value="TRUE"> TRUE</label>
+<label class="opt-row"><input type="radio" name="q30" value="FALSE"> FALSE</label>
+<label class="opt-row"><input type="radio" name="q30" value="NOT GIVEN"> NOT GIVEN</label>
+</div>
+<div class="qitem"><span class="qnum">31.</span> Poor town planning is a major contributor to climate change.<span id="hint-q31"></span><br>
+<label class="opt-row"><input type="radio" name="q31" value="TRUE"> TRUE</label>
+<label class="opt-row"><input type="radio" name="q31" value="FALSE"> FALSE</label>
+<label class="opt-row"><input type="radio" name="q31" value="NOT GIVEN"> NOT GIVEN</label>
+</div>
+<div class="qitem"><span class="qnum">32.</span> In Renaissance times, local people fought against the changes to Pienza and Ferrara.<span id="hint-q32"></span><br>
+<label class="opt-row"><input type="radio" name="q32" value="TRUE"> TRUE</label>
+<label class="opt-row"><input type="radio" name="q32" value="FALSE"> FALSE</label>
+<label class="opt-row"><input type="radio" name="q32" value="NOT GIVEN"> NOT GIVEN</label>
+</div>
+<div class="qitem"><span class="qnum">33.</span> Leonardo da Vinci kept a neat, organised record of his designs.<span id="hint-q33"></span><br>
+<label class="opt-row"><input type="radio" name="q33" value="TRUE"> TRUE</label>
+<label class="opt-row"><input type="radio" name="q33" value="FALSE"> FALSE</label>
+<label class="opt-row"><input type="radio" name="q33" value="NOT GIVEN"> NOT GIVEN</label>
+</div>
+</div>
+<div class="qgroup">
+<h3>Questions 34-40</h3>
+<div class="instr">Complete the summary below.</div>
+<div class="instr">Choose ONE WORD ONLY from the passage for each answer.</div>
+<div class="instr">Write your answers in boxes 34-40 on your answer sheet.</div>
+<div class="summarybox"><span class="stitle">Leonardo da Vinci’s ideal city</span>A collection of Leonardo da Vinci’s paperwork reveals his design of a new city beside the Ticino River. This was to provide better <b class="qnum-inline">34</b><input type="text" class="qtext" id="q34" autocomplete="off"><span id="hint-q34"></span> for trade and a less polluted environment. Although Leonardo da Vinci’s city shared many of the ideals of his time, some of his innovations were considered unconventional in their design. They included features that can be seen in some tower blocks today, such as <b class="qnum-inline">35</b><input type="text" class="qtext" id="q35" autocomplete="off"><span id="hint-q35"></span> on the exterior of a building. Leonardo da Vinci wasn’t only an architect. His expertise in <b class="qnum-inline">36</b><input type="text" class="qtext" id="q36" autocomplete="off"><span id="hint-q36"></span> was evident in his plans for artificial canals within his ideal city. He also believed that the height of houses should relate to the width of streets in case earthquakes occurred. The design of many cities in Italy today follows this <b class="qnum-inline">37</b><input type="text" class="qtext" id="q37" autocomplete="off"><span id="hint-q37"></span>. While some cities from <b class="qnum-inline">38</b><input type="text" class="qtext" id="q38" autocomplete="off"><span id="hint-q38"></span> times have aspects that can also be found in Leonardo’s designs, his ideas weren’t put into practice until long after his death. <b class="qnum-inline">39</b><input type="text" class="qtext" id="q39" autocomplete="off"><span id="hint-q39"></span> is one example of a city that was redesigned in the 19th century in the way that Leonardo had envisaged. His ideas are also relevant to today’s world, where building <b class="qnum-inline">40</b><input type="text" class="qtext" id="q40" autocomplete="off"><span id="hint-q40"></span> no longer seems to be the best approach.</div></div>
+
+<div class="explain-panel" id="explainPanel-2"><h3>📘 Giải thích chi tiết đáp án</h3><div class="explain-item"><b class="eq">Câu 27.</b> Đáp án đúng: <span class="eans">NOT GIVEN</span><span class="equote">&ldquo;The word 'genius' is universally associated with the name of Leonardo da Vinci&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Statement 27 says people first called Leonardo a genius 500 years ago. The passage only says the label is universally associated with his name today, with no mention of WHEN this association first began — so the answer is NOT GIVEN.</span><span class="etext etext-vi"><b class="elang">VI:</b> Câu 27 nói người ta lần đầu gọi Leonardo là thiên tài cách đây 500 năm. Bài chỉ nói nhãn hiệu này gắn liền với tên ông ngày nay, không hề nói khi nào sự gắn liền này bắt đầu → đáp án NOT GIVEN.</span></div><div class="explain-item"><b class="eq">Câu 28.</b> Đáp án đúng: <span class="eans">NOT GIVEN</span><span class="equote">&ldquo;Today, the world is on the cusp of a climate crisis, which is predicted to cause widespread displacement, extinctions and death, if left unaddressed&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Statement 28 says the climate crisis is predicted to cause MORE deaths than the plague. The passage gives the plague's death toll (200 million) but only vaguely predicts 'displacement, extinctions and death' for the climate crisis, with no numerical comparison — so the answer is NOT GIVEN.</span><span class="etext etext-vi"><b class="elang">VI:</b> Câu 28 nói khủng hoảng khí hậu được dự đoán gây ra NHIỀU tử vong hơn bệnh dịch hạch. Bài chỉ nêu số người chết do dịch hạch (200 triệu) nhưng chỉ dự đoán mơ hồ 'displacement, extinctions and death' cho khủng hoảng khí hậu, không có so sánh số liệu nào → đáp án NOT GIVEN.</span></div><div class="explain-item"><b class="eq">Câu 29.</b> Đáp án đúng: <span class="eans">TRUE</span><span class="equote">&ldquo;Then, as now, radical solutions were called for to revolutionise the way people lived and safeguard humanity against catastrophe&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Statement 29 says today's challenges can be compared to those of earlier times. Paragraph 2 directly draws this comparison ('Then, as now') between the plague crisis and today's climate crisis — matching the statement, so the answer is TRUE.</span><span class="etext etext-vi"><b class="elang">VI:</b> Câu 29 nói những thử thách ngày nay có thể so sánh với thời trước. Đoạn 2 trực tiếp đưa ra sự so sánh này ('Then, as now' - khi đó, cũng như bây giờ) giữa khủng hoảng dịch hạch và khủng hoảng khí hậu ngày nay — khớp với câu hỏi → đáp án TRUE.</span></div><div class="explain-item"><b class="eq">Câu 30.</b> Đáp án đúng: <span class="eans">FALSE</span><span class="equote">&ldquo;he began to work on an 'ideal city' project, which - due to its excessive costs - would remain unfulfilled&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Statement 30 says Leonardo's ideal city was built in the 15th century. Paragraph 3 explicitly says the project 'would remain unfulfilled' due to its costs — it was NEVER built — this contradicts the statement, so the answer is FALSE.</span><span class="etext etext-vi"><b class="elang">VI:</b> Câu 30 nói thành phố lý tưởng của Leonardo đã được xây dựng vào thế kỷ 15. Đoạn 3 nói rõ dự án 'would remain unfulfilled' (không bao giờ được thực hiện) vì chi phí quá cao — KHÔNG hề được xây — trái ngược với câu hỏi → đáp án FALSE.</span></div><div class="explain-item"><b class="eq">Câu 31.</b> Đáp án đúng: <span class="eans">TRUE</span><span class="equote">&ldquo;given that unsustainable urban models are a key cause of global climate change today&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Statement 31 says poor town planning is a major cause of climate change. Paragraph 3 states unsustainable urban models are 'a key cause of global climate change today' — matching the statement, so the answer is TRUE.</span><span class="etext etext-vi"><b class="elang">VI:</b> Câu 31 nói quy hoạch đô thị kém là nguyên nhân lớn gây ra biến đổi khí hậu. Đoạn 3 nói các mô hình đô thị không bền vững là 'a key cause of global climate change today' (nguyên nhân chính gây biến đổi khí hậu ngày nay) — khớp với câu hỏi → đáp án TRUE.</span></div><div class="explain-item"><b class="eq">Câu 32.</b> Đáp án đúng: <span class="eans">NOT GIVEN</span><span class="equote">&ldquo;prominent Renaissance men pushed forward large-scale urban projects in Italy, such as the reconfiguration of the town of Pienza and the expansion of the city of Ferrara&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Statement 32 says local people fought against the Pienza/Ferrara changes. The passage only describes these projects being carried out, with no mention of any local resistance or protest — so the answer is NOT GIVEN.</span><span class="etext etext-vi"><b class="elang">VI:</b> Câu 32 nói người dân địa phương đã phản đối những thay đổi ở Pienza và Ferrara. Bài chỉ mô tả các dự án này được thực hiện, không hề đề cập đến bất kỳ sự phản đối hay phản kháng nào của người dân → đáp án NOT GIVEN.</span></div><div class="explain-item"><b class="eq">Câu 33.</b> Đáp án đúng: <span class="eans">FALSE</span><span class="equote">&ldquo;It is not easy to identify a coordinated vision of Leonardo's ideal city because of his disordered way of working with notes and sketches&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Statement 33 says Leonardo kept a neat, organised record. Paragraph 5 explicitly describes his 'disordered way of working with notes and sketches' — this contradicts the statement, so the answer is FALSE.</span><span class="etext etext-vi"><b class="elang">VI:</b> Câu 33 nói Leonardo giữ hồ sơ thiết kế gọn gàng, có tổ chức. Đoạn 5 nói rõ cách làm việc của ông 'disordered' (lộn xộn) với các ghi chú và bản vẽ — trái ngược với câu hỏi → đáp án FALSE.</span></div><div class="explain-item"><b class="eq">Câu 34.</b> Đáp án đúng: <span class="eans">transport</span><span class="equote">&ldquo;He designed the city for the easy transport of goods and clean urban spaces&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Paragraph 5 says Leonardo designed the city for easier 'transport' of goods — this matches the gap 'provide better ___ for trade' → answer 'transport'.</span><span class="etext etext-vi"><b class="elang">VI:</b> Đoạn 5 nói Leonardo thiết kế thành phố để việc vận chuyển ('transport') hàng hóa dễ dàng hơn — khớp với ô 'provide better ___ for trade' → đáp án 'transport'.</span></div><div class="explain-item"><b class="eq">Câu 35.</b> Đáp án đúng: <span class="eans">staircases</span><span class="equote">&ldquo;Leonardo wanted the city to be built on several levels, linked with vertical outdoor staircases. This design can be seen in some of today's high-rise buildings&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Paragraph 6 mentions vertical outdoor 'staircases' as an unconventional design feature seen in today's tower blocks — this matches the gap 'such as ___ on the exterior of a building' → answer 'staircases'.</span><span class="etext etext-vi"><b class="elang">VI:</b> Đoạn 6 nhắc đến cầu thang ('staircases') ngoài trời theo chiều thẳng đứng, một đặc điểm thiết kế khác thường thấy ở các tòa cao tầng ngày nay — khớp với ô 'such as ___ on the exterior of a building' → đáp án 'staircases'.</span></div><div class="explain-item"><b class="eq">Câu 36.</b> Đáp án đúng: <span class="eans">engineering</span><span class="equote">&ldquo;the true originality of Leonardo's vision was its fusion of architecture and engineering. Leonardo designed extensive hydraulic plants to create artificial canals&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Paragraph 7 says Leonardo's engineering expertise shows in his design of artificial canals — this matches the gap 'His expertise in ___ was evident in his plans for artificial canals' → answer 'engineering'.</span><span class="etext etext-vi"><b class="elang">VI:</b> Đoạn 7 nói chuyên môn kỹ thuật ('engineering') của Leonardo thể hiện qua thiết kế các kênh nhân tạo — khớp với ô 'His expertise in ___ was evident in his plans for artificial canals' → đáp án 'engineering'.</span></div><div class="explain-item"><b class="eq">Câu 37.</b> Đáp án đúng: <span class="eans">rule</span><span class="equote">&ldquo;the width of the streets ought to match the average height of the adjacent houses: a rule still followed in many contemporary cities across Italy&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Paragraph 7 calls this principle 'a rule' still followed in Italian cities today — this matches the gap 'The design of many cities in Italy today follows this ___' → answer 'rule'.</span><span class="etext etext-vi"><b class="elang">VI:</b> Đoạn 7 gọi nguyên tắc này là 'a rule' (một quy tắc) vẫn được các thành phố Ý ngày nay tuân theo — khớp với ô 'The design of many cities in Italy today follows this ___' → đáp án 'rule'.</span></div><div class="explain-item"><b class="eq">Câu 38.</b> Đáp án đúng: <span class="eans">Roman</span><span class="equote">&ldquo;Although some of these features existed in Roman cities, before Leonardo's drawings there had never been a multi-level, compact modern city&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Paragraph 8 says some features existed in 'Roman' cities before Leonardo — this matches the gap 'some cities from ___ times have aspects that can also be found in Leonardo's designs' → answer 'Roman'.</span><span class="etext etext-vi"><b class="elang">VI:</b> Đoạn 8 nói một số đặc điểm đã tồn tại ở các thành phố 'Roman' (La Mã) trước Leonardo — khớp với ô 'some cities from ___ times have aspects that can also be found in Leonardo's designs' → đáp án 'Roman'.</span></div><div class="explain-item"><b class="eq">Câu 39.</b> Đáp án đúng: <span class="eans">Paris</span><span class="equote">&ldquo;is an idea that can be found in Georges-Eugène Haussmann's renovation of Paris under Emperor Napoleon III between 1853 and 1870&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Paragraph 8 names 'Paris' as the 19th-century city redesigned along lines similar to Leonardo's vision — this matches the gap '___ is one example of a city that was redesigned in the 19th century' → answer 'Paris'.</span><span class="etext etext-vi"><b class="elang">VI:</b> Đoạn 8 nêu tên 'Paris' là thành phố được tái thiết kế vào thế kỷ 19 theo hướng tương tự tầm nhìn của Leonardo — khớp với ô '___ is one example of a city that was redesigned in the 19th century' → đáp án 'Paris'.</span></div><div class="explain-item"><b class="eq">Câu 40.</b> Đáp án đúng: <span class="eans">outwards</span><span class="equote">&ldquo;Many scholars think that the compact city, built upwards instead of outwards... could help modern cities become more efficient and sustainable&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Paragraph 9 says cities should be built upwards rather than 'outwards' — this matches the gap 'building ___ no longer seems to be the best approach' → answer 'outwards'.</span><span class="etext etext-vi"><b class="elang">VI:</b> Đoạn 9 nói thành phố nên được xây theo chiều cao hơn là mở rộng ra ngoài ('outwards') — khớp với ô 'building ___ no longer seems to be the best approach' → đáp án 'outwards'.</span></div></div>
+  </div>
+</div>
+
+<button id="submitBtn" onclick="requestSubmit()">Nộp bài</button>
+
+<div class="modal-overlay hidden" id="confirmModal">
+  <div class="modal-box">
+    <h3>Xác nhận nộp bài</h3>
+    <p>Bạn có chắc muốn nộp bài? Sau khi nộp sẽ không thể sửa lại.</p>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="cancelSubmit()">Quay lại làm bài</button>
+      <button class="btn-confirm" onclick="confirmSubmit()">Xác nhận nộp</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="timeUpModal">
+  <div class="modal-box">
+    <h3>⏰ Hết giờ!</h3>
+    <p>Đã hết 60 phút làm bài. Bạn có 5 phút để nộp bài, sau đó bài sẽ tự động được nộp.</p>
+    <div class="modal-actions">
+      <button class="btn-confirm" style="flex:none;width:100%;" onclick="confirmSubmit()">Nộp bài ngay</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="resultModal">
+  <div class="modal-box" style="width:560px;">
+    <div id="resultBox"></div>
+    <div class="modal-actions"><button class="btn-cancel" style="flex:none;width:100%;" onclick="closeResult()">Đóng — Xem lại bài làm</button></div>
+  </div>
+</div>
+
+<script>
+var TEST_NUM = 8;
+var TOTAL_QUESTIONS = 40;
+var PASSAGE_COUNTS = [13, 13, 14];
+var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyfZgrcZfOw-g5nCLlQ5QyLCCADuct8QRxW31SG8F3IZfkgL0x_3LOoPWBHRFRNiXA1/exec";
+var ANS = {"1": "TRUE", "2": "NOT GIVEN", "3": "TRUE", "4": "FALSE", "5": "FALSE", "6": "TRUE", "7": "TRUE", "8": "NOT GIVEN", "9": ["Ridgeway"], "10": ["documents"], "11": ["soil"], "12": ["fertility"], "13": ["Rhiannon"], "14": "C", "15": "B", "16": "E", "17": "A", "18": "C", "19": "B", "20": "D", "21": "A", "22": "C", "23": "A", "24": ["flavour", "flavor"], "25": ["size"], "26": ["salt"], "27": "NOT GIVEN", "28": "NOT GIVEN", "29": "TRUE", "30": "FALSE", "31": "TRUE", "32": "NOT GIVEN", "33": "FALSE", "34": ["transport"], "35": ["staircases"], "36": ["engineering"], "37": ["rule"], "38": ["Roman"], "39": ["Paris"], "40": ["outwards"]};
+var UNITS = [{"type": "radio", "n": 1}, {"type": "radio", "n": 2}, {"type": "radio", "n": 3}, {"type": "radio", "n": 4}, {"type": "radio", "n": 5}, {"type": "radio", "n": 6}, {"type": "radio", "n": 7}, {"type": "radio", "n": 8}, {"type": "text", "n": 9}, {"type": "text", "n": 10}, {"type": "text", "n": 11}, {"type": "text", "n": 12}, {"type": "text", "n": 13}, {"type": "select", "n": 14}, {"type": "select", "n": 15}, {"type": "select", "n": 16}, {"type": "select", "n": 17}, {"type": "select", "n": 18}, {"type": "select", "n": 19}, {"type": "select", "n": 20}, {"type": "select", "n": 21}, {"type": "select", "n": 22}, {"type": "select", "n": 23}, {"type": "text", "n": 24}, {"type": "text", "n": 25}, {"type": "text", "n": 26}, {"type": "radio", "n": 27}, {"type": "radio", "n": 28}, {"type": "radio", "n": 29}, {"type": "radio", "n": 30}, {"type": "radio", "n": 31}, {"type": "radio", "n": 32}, {"type": "radio", "n": 33}, {"type": "text", "n": 34}, {"type": "text", "n": 35}, {"type": "text", "n": 36}, {"type": "text", "n": 37}, {"type": "text", "n": 38}, {"type": "text", "n": 39}, {"type": "text", "n": 40}];
+var CHECKBOX_GROUPS = [];
+</script>
+<script>
+/* ===================== READING TEST ENGINE (shared) ===================== */
+/* Requires globals defined in the per-test <script> block BEFORE this file:
+   TEST_NUM, TOTAL_QUESTIONS, PASSAGE_COUNTS ([n1,n2,n3]), ANS {}, UNITS [], APPS_SCRIPT_URL
+*/
+(function(){
+  'use strict';
+
+  function pad(n,len){ n=String(n); while(n.length<len) n='0'+n; return n; }
+  function qLabel(n){ return 'Q.'+pad(n,2)+'.TEST'+pad(TEST_NUM,3); }
+  function norm(s){ return String(s==null?'':s).toLowerCase().trim().replace(/\s+/g,' '); }
+  window.qLabel = qLabel;
+
+  /* ---------------- Popup / start ---------------- */
+  window._studentName = '';
+  window._studentClass = '';
+  window._testStartTime = null;
+  var submitted = false;
+  var timerStopped = false;
+
+  window.startExam = function(){
+    var nameEl = document.getElementById('stuName');
+    var classEl = document.getElementById('stuClass');
+    var errEl = document.getElementById('nameErr');
+    var name = nameEl.value.trim();
+    var cls = classEl.value.trim();
+    if(!name || !cls){
+      errEl.textContent = 'Vui lòng nhập đầy đủ Họ và tên và Lớp.';
+      return;
+    }
+    errEl.textContent = '';
+    window._studentName = name;
+    window._studentClass = cls;
+    window._testStartTime = Date.now();
+    document.getElementById('nameOverlay').classList.add('hidden');
+    window.enterFullscreen();
+  };
+
+  /* ---------------- Fullscreen / anti-cheat ---------------- */
+  var fsViolations = 0, tabViolations = 0, focusViolations = 0;
+  var violationLog = [];
+
+  window.enterFullscreen = function(){
+    var el = document.documentElement;
+    try{
+      if(el.requestFullscreen) el.requestFullscreen().catch(function(){});
+      else if(el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+    }catch(e){}
+    var ov = document.getElementById('fsOverlay');
+    if(ov) ov.style.display = 'none';
+  };
+
+  function isFullscreen(){
+    return !!(document.fullscreenElement || document.webkitFullscreenElement);
+  }
+
+  function onFsChange(){
+    if(submitted) return;
+    if(!window._testStartTime) return;
+    if(!isFullscreen()){
+      fsViolations++;
+      violationLog.push('Thoát fullscreen lúc ' + new Date().toLocaleTimeString());
+      var ov = document.getElementById('fsOverlay');
+      if(ov) ov.style.display = 'flex';
+    }
+  }
+  document.addEventListener('fullscreenchange', onFsChange);
+  document.addEventListener('webkitfullscreenchange', onFsChange);
+
+  document.addEventListener('visibilitychange', function(){
+    if(submitted || !window._testStartTime) return;
+    if(document.hidden){
+      tabViolations++;
+      violationLog.push('Chuyển tab lúc ' + new Date().toLocaleTimeString());
+      showBanner('⚠ Phát hiện chuyển tab! Vi phạm được ghi nhận.');
+    }
+  });
+
+  window.addEventListener('blur', function(){
+    if(submitted || !window._testStartTime) return;
+    focusViolations++;
+    violationLog.push('Mất focus cửa sổ lúc ' + new Date().toLocaleTimeString());
+    showBanner('⚠ Phát hiện mất focus cửa sổ! Vi phạm được ghi nhận.');
+  });
+
+  function showBanner(msg){
+    var b = document.getElementById('warnBanner');
+    if(!b) return;
+    b.textContent = msg;
+    b.style.display = 'block';
+    clearTimeout(b._t);
+    b._t = setTimeout(function(){ b.style.display = 'none'; }, 4000);
+  }
+
+  document.addEventListener('contextmenu', function(e){ if(submitted) return; e.preventDefault(); });
+  document.addEventListener('copy', function(e){ if(submitted) return; e.preventDefault(); });
+  document.addEventListener('paste', function(e){ if(submitted) return; e.preventDefault(); });
+  document.addEventListener('cut', function(e){ if(submitted) return; e.preventDefault(); });
+  document.addEventListener('dragstart', function(e){ if(submitted) return; e.preventDefault(); });
+  document.addEventListener('drop', function(e){ if(submitted) return; e.preventDefault(); });
+
+  document.addEventListener('keydown', function(e){
+    if(submitted) return;
+    var k = e.key;
+    if(k === 'F12'){ e.preventDefault(); return; }
+    if(e.ctrlKey && ['c','C','a','A','s','S','u','U','p','P','v','V'].indexOf(k) !== -1){ e.preventDefault(); return; }
+    if(e.ctrlKey && e.shiftKey && ['i','I','j','J','c','C','k','K'].indexOf(k) !== -1){ e.preventDefault(); return; }
+    if(k === 'Escape'){ e.preventDefault(); return; }
+  });
+
+  window.getViolationLog = function(){
+    submitted = true;
+    return { tabViolations: tabViolations, focusViolations: focusViolations, fsViolations: fsViolations, log: violationLog };
+  };
+  window.stopTimer = function(){ timerStopped = true; };
+
+  /* ---------------- Timer ---------------- */
+  (function(){
+    var DURATION = 60*60*1000, EXTRA = 5*60*1000;
+    var startTime = null, extraTriggered = false, autoSubmitted = false;
+    function fmt(ms){
+      if(ms<0) ms=0;
+      var s = Math.floor(ms/1000);
+      var m = Math.floor(s/60); s = s%60;
+      return pad(m,2)+':'+pad(s,2);
+    }
+    function tick(){
+      if(!startTime){
+        if(!window._testStartTime){ requestAnimationFrame(tick); return; }
+        startTime = window._testStartTime;
+      }
+      if(timerStopped) return;
+      var box = document.getElementById('timerBox');
+      var elapsed = Date.now() - startTime;
+      var remain = DURATION - elapsed;
+      if(remain <= 0 && !extraTriggered){
+        extraTriggered = true;
+        showTimeUpModal();
+        remain = 0 - (Date.now() - (startTime+DURATION));
+      }
+      if(remain <= -EXTRA && !autoSubmitted){
+        autoSubmitted = true;
+        doSubmit();
+        return;
+      }
+      if(box){
+        var showMs = extraTriggered ? (EXTRA + (DURATION - elapsed)) : remain;
+        box.textContent = fmt(Math.max(0,showMs));
+        box.classList.remove('warn','danger');
+        if(!extraTriggered){
+          if(remain <= 2*60*1000) box.classList.add('danger');
+          else if(remain <= 10*60*1000) box.classList.add('warn');
+        } else {
+          box.classList.add('danger');
+        }
+      }
+      setTimeout(tick, 500);
+    }
+    function showTimeUpModal(){
+      var m = document.getElementById('timeUpModal');
+      if(m) m.classList.remove('hidden');
+    }
+    window._timerTick = tick;
+    requestAnimationFrame(tick);
+  })();
+
+  /* ---------------- Tabs ---------------- */
+  window.showPassage = function(idx){
+    for(var i=0;i<3;i++){
+      var p = document.getElementById('passage-'+i);
+      var q = document.getElementById('questions-'+i);
+      var t = document.getElementById('tabBtn-'+i);
+      if(!p) continue;
+      if(i===idx){ p.classList.add('active'); q.classList.add('active'); t.classList.add('active'); }
+      else { p.classList.remove('active'); q.classList.remove('active'); t.classList.remove('active'); }
+    }
+  };
+
+  /* ---------------- Split divider ---------------- */
+  function initDivider(){
+    var dragging = false;
+    var divider = document.getElementById('divider');
+    var area = document.getElementById('examArea');
+    if(!divider) return;
+    function onMove(clientX){
+      var rect = area.getBoundingClientRect();
+      var pct = (clientX - rect.left) / rect.width * 100;
+      pct = Math.max(20, Math.min(80, pct));
+      document.querySelectorAll('.passage-panel').forEach(function(el){ el.style.width = pct+'%'; });
+      document.querySelectorAll('.question-panel').forEach(function(el){ el.style.width = (100-pct)+'%'; });
+    }
+    divider.addEventListener('mousedown', function(e){ dragging = true; e.preventDefault(); });
+    document.addEventListener('mousemove', function(e){ if(dragging) onMove(e.clientX); });
+    document.addEventListener('mouseup', function(){ dragging = false; });
+    divider.addEventListener('touchstart', function(e){ dragging = true; }, {passive:true});
+    document.addEventListener('touchmove', function(e){ if(dragging && e.touches[0]) onMove(e.touches[0].clientX); }, {passive:true});
+    document.addEventListener('touchend', function(){ dragging = false; });
+  }
+
+  /* ---------------- Highlight ---------------- */
+  var currentColor = 'yellow';
+  var eraserMode = false;
+  var penMode = false;
+  var penEraseMode = false;
+  var penColor = 'red';
+
+  function initHighlightToolbar(){
+    document.querySelectorAll('.hl-btn').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        currentColor = btn.getAttribute('data-c');
+        eraserMode = false;
+        document.querySelectorAll('.hl-btn').forEach(function(b){ b.classList.remove('active'); });
+        btn.classList.add('active');
+        document.getElementById('eraserBtn').classList.remove('active');
+      });
+    });
+    var er = document.getElementById('eraserBtn');
+    if(er) er.addEventListener('click', function(){
+      eraserMode = !eraserMode;
+      er.classList.toggle('active', eraserMode);
+    });
+    var first = document.querySelector('.hl-btn[data-c="yellow"]');
+    if(first) first.classList.add('active');
+  }
+
+  function wrapRange(range, cls){
+    var frag = range.extractContents();
+    var span = document.createElement('span');
+    span.className = cls;
+    span.appendChild(frag);
+    range.insertNode(span);
+  }
+
+  function handleMouseUp(container){
+    var sel = window.getSelection();
+    if(!sel || sel.isCollapsed || sel.rangeCount===0) return;
+    var range = sel.getRangeAt(0);
+    if(!container.contains(range.commonAncestorContainer)) return;
+    var tag = range.commonAncestorContainer.nodeType===1 ? range.commonAncestorContainer.tagName : range.commonAncestorContainer.parentElement.tagName;
+    if(['INPUT','SELECT','TEXTAREA'].indexOf(tag)!==-1) return;
+    if(submitted){
+      var rect = range.getBoundingClientRect();
+      var text = sel.toString();
+      sel.removeAllRanges();
+      doDictLookup(text, rect);
+      return;
+    }
+    if(eraserMode || penMode) return;
+    try{
+      wrapRange(range, 'hl-'+currentColor);
+    }catch(e){}
+    sel.removeAllRanges();
+  }
+
+  function handleEraseClick(e){
+    if(!eraserMode) return;
+    var el = e.target;
+    if(el.classList && (el.classList.contains('hl-yellow')||el.classList.contains('hl-green')||el.classList.contains('hl-pink'))){
+      var parent = el.parentNode;
+      while(el.firstChild) parent.insertBefore(el.firstChild, el);
+      parent.removeChild(el);
+    }
+  }
+
+  function initHighlightZones(){
+    document.querySelectorAll('.passage-panel, .question-panel').forEach(function(zone){
+      zone.addEventListener('mouseup', function(){ handleMouseUp(zone); });
+      zone.addEventListener('click', function(e){ handleEraseClick(e); });
+      zone.addEventListener('touchend', function(){ handleMouseUp(zone); });
+      zone.addEventListener('dblclick', function(){
+        if(!submitted) return;
+        var sel = window.getSelection();
+        if(!sel || sel.isCollapsed || sel.rangeCount===0) return;
+        var range = sel.getRangeAt(0);
+        var rect = range.getBoundingClientRect();
+        var text = sel.toString();
+        doDictLookup(text, rect);
+      });
+    });
+  }
+
+  /* ---------------- Selected-answer highlight ---------------- */
+  function initSelectedAnswerHighlight(){
+    document.querySelectorAll('input[type=radio], input[type=checkbox]').forEach(function(inp){
+      inp.addEventListener('change', function(){
+        var label = inp.closest('.opt-row');
+        if(inp.type==='radio'){
+          document.querySelectorAll('input[name="'+inp.name+'"]').forEach(function(o){
+            var l = o.closest('.opt-row');
+            if(l) l.classList.remove('selected-answer');
+          });
+          if(inp.checked && label) label.classList.add('selected-answer');
+        } else {
+          if(label) label.classList.toggle('selected-answer', inp.checked);
+        }
+      });
+    });
+  }
+
+  /* ---------------- Checkbox group max-limit ---------------- */
+  window.wireCheckboxLimit = function(name, max){
+    function showLimit(){
+      var id = 'chk-limit-'+name;
+      var el = document.getElementById(id);
+      if(!el){
+        el = document.createElement('div');
+        el.id = id;
+        el.style.cssText = 'color:#e74c3c;font-size:12px;font-weight:bold;margin-top:4px;';
+        var grp = document.querySelector('input[name="'+name+'"]');
+        if(grp && grp.parentNode && grp.parentNode.parentNode) grp.parentNode.parentNode.appendChild(el);
+      }
+      el.textContent = '⚠ Chỉ được chọn tối đa ' + max + ' đáp án!';
+      clearTimeout(el._t);
+      el._t = setTimeout(function(){ el.textContent=''; }, 2500);
+    }
+    document.querySelectorAll('input[name="'+name+'"]').forEach(function(inp){
+      inp.addEventListener('change', function(){
+        if(inp.checked){
+          var n = document.querySelectorAll('input[name="'+name+'"]:checked').length;
+          if(n>max){ inp.checked=false; inp.dispatchEvent(new Event('_uncheck')); showLimit();
+            var label = inp.closest('.opt-row'); if(label) label.classList.remove('selected-answer');
+          }
+        }
+      });
+    });
+  };
+
+  /* ---------------- Pen (freehand drawing) tool ---------------- */
+  var SVG_NS = 'http://www.w3.org/2000/svg';
+  var drawLayers = []; // {zone, svg}
+
+  function initDrawLayers(){
+    document.querySelectorAll('.passage-panel, .question-panel').forEach(function(zone){
+      var svg = document.createElementNS(SVG_NS, 'svg');
+      svg.setAttribute('class', 'draw-layer');
+      svg.style.height = Math.max(zone.scrollHeight, zone.clientHeight) + 'px';
+      zone.appendChild(svg);
+      drawLayers.push({zone: zone, svg: svg});
+      wireDrawing(zone, svg);
+    });
+  }
+
+  function resizeDrawLayer(entry){
+    entry.svg.style.height = Math.max(entry.zone.scrollHeight, entry.zone.clientHeight) + 'px';
+  }
+
+  function wireDrawing(zone, svg){
+    var drawing = false;
+    var curPath = null;
+    var pts = [];
+
+    function pos(ev){
+      var rect = zone.getBoundingClientRect();
+      var cx = (ev.touches ? ev.touches[0].clientX : ev.clientX);
+      var cy = (ev.touches ? ev.touches[0].clientY : ev.clientY);
+      return { x: cx - rect.left + zone.scrollLeft, y: cy - rect.top + zone.scrollTop };
+    }
+
+    function startDraw(ev){
+      if(!penMode || penEraseMode || submitted) return;
+      var tag = ev.target.tagName;
+      if(['INPUT','SELECT','TEXTAREA','A'].indexOf(tag)!==-1) return;
+      drawing = true;
+      pts = [];
+      var p = pos(ev);
+      pts.push(p.x.toFixed(1)+','+p.y.toFixed(1));
+      curPath = document.createElementNS(SVG_NS, 'polyline');
+      curPath.setAttribute('points', pts.join(' '));
+      curPath.setAttribute('fill', 'none');
+      curPath.setAttribute('stroke', penColor==='red' ? '#e53935' : (penColor==='blue' ? '#1e88e5' : '#222'));
+      curPath.setAttribute('stroke-width', '2.2');
+      curPath.setAttribute('stroke-linecap', 'round');
+      curPath.setAttribute('stroke-linejoin', 'round');
+      svg.appendChild(curPath);
+      ev.preventDefault();
+    }
+    function moveDraw(ev){
+      if(!drawing || !curPath) return;
+      var p = pos(ev);
+      pts.push(p.x.toFixed(1)+','+p.y.toFixed(1));
+      curPath.setAttribute('points', pts.join(' '));
+      ev.preventDefault();
+    }
+    function endDraw(){
+      drawing = false;
+      curPath = null;
+      pts = [];
+    }
+    function eraseAt(ev){
+      if(!penEraseMode || submitted) return;
+      var p = pos(ev);
+      var els = svg.querySelectorAll('polyline');
+      for(var i=0;i<els.length;i++){
+        var el = els[i];
+        var box = el.getBBox();
+        var pad = 8;
+        if(p.x >= box.x-pad && p.x <= box.x+box.width+pad && p.y >= box.y-pad && p.y <= box.y+box.height+pad){
+          el.remove();
+        }
+      }
+    }
+
+    svg.addEventListener('mousedown', function(ev){
+      if(penEraseMode){ eraseAt(ev); return; }
+      startDraw(ev);
+    });
+    svg.addEventListener('mousemove', moveDraw);
+    svg.addEventListener('mouseup', endDraw);
+    svg.addEventListener('mouseleave', endDraw);
+    svg.addEventListener('touchstart', function(ev){
+      if(penEraseMode){ eraseAt(ev); return; }
+      startDraw(ev);
+    }, {passive:false});
+    svg.addEventListener('touchmove', moveDraw, {passive:false});
+    svg.addEventListener('touchend', endDraw);
+  }
+
+  function updatePenLayers(){
+    drawLayers.forEach(function(entry){
+      resizeDrawLayer(entry);
+      entry.svg.classList.toggle('pen-active', penMode && !penEraseMode);
+      entry.svg.classList.toggle('pen-erase', penMode && penEraseMode);
+    });
+  }
+
+  function initPenTool(){
+    var btn = document.getElementById('penBtn');
+    var eraseBtn = document.getElementById('penEraserBtn');
+    var colorBtns = document.querySelectorAll('.pen-color-btn');
+    if(!btn) return;
+    function setColorBtnsVisible(show){
+      colorBtns.forEach(function(b){ b.classList.toggle('show', show); });
+      if(eraseBtn) eraseBtn.classList.toggle('show', show);
+    }
+    colorBtns.forEach(function(b){
+      if(b.getAttribute('data-pc')===penColor) b.classList.add('active');
+      b.addEventListener('click', function(){
+        penColor = b.getAttribute('data-pc');
+        penEraseMode = false;
+        if(eraseBtn) eraseBtn.classList.remove('active');
+        colorBtns.forEach(function(o){ o.classList.remove('active'); });
+        b.classList.add('active');
+        updatePenLayers();
+      });
+    });
+    btn.addEventListener('click', function(){
+      penMode = !penMode;
+      btn.classList.toggle('active', penMode);
+      document.body.classList.toggle('pen-mode', penMode);
+      setColorBtnsVisible(penMode);
+      if(penMode){
+        eraserMode = false;
+        var er = document.getElementById('eraserBtn');
+        if(er) er.classList.remove('active');
+      } else {
+        penEraseMode = false;
+        if(eraseBtn) eraseBtn.classList.remove('active');
+      }
+      updatePenLayers();
+    });
+    if(eraseBtn){
+      eraseBtn.addEventListener('click', function(){
+        penEraseMode = !penEraseMode;
+        eraseBtn.classList.toggle('active', penEraseMode);
+        updatePenLayers();
+      });
+    }
+  }
+
+  /* ---------------- Post-submit dictionary lookup ---------------- */
+  function dictEsc(s){
+    return String(s).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+  function removeDictPopup(){
+    var el = document.getElementById('dictPopup');
+    if(el) el.remove();
+  }
+  function showDictPopup(innerHtml, rect, wide){
+    // keep existing popup element in place if it already exists (avoids losing
+    // scroll position while a multi-chunk translation is progressively updated)
+    var el = document.getElementById('dictPopup');
+    var isNew = !el;
+    if(!el){
+      el = document.createElement('div');
+      el.className = 'dict-popup';
+      el.id = 'dictPopup';
+      document.body.appendChild(el);
+    }
+    el.classList.toggle('dict-popup-wide', !!wide);
+    el.innerHTML = '<span class="dict-close">✕</span><div class="dict-body">' + innerHtml + '</div>';
+    el.querySelector('.dict-close').addEventListener('click', removeDictPopup);
+    if(isNew){
+      var popW = wide ? 480 : 320;
+      var top = rect.bottom + 8;
+      var left = rect.left;
+      var maxLeft = window.innerWidth - popW - 16;
+      if(left > maxLeft) left = Math.max(8, maxLeft);
+      if(left < 8) left = 8;
+      var maxTop = window.innerHeight - 90;
+      if(top > maxTop) top = Math.max(8, rect.top - 90);
+      el.style.top = Math.max(8,top) + 'px';
+      el.style.left = left + 'px';
+    }
+  }
+  // MyMemory's free/anonymous endpoint truncates or degrades quality on long queries
+  // (roughly >450-500 chars), so long selections are split into sentence-sized chunks
+  // and translated sequentially, then re-assembled — this is what makes long-passage
+  // translation actually show the FULL translated text instead of one short fragment.
+  function splitIntoChunks(text, maxLen){
+    var sentences = text.match(/[^.!?]+[.!?]*(\s+|$)/g) || [text];
+    var chunks = [];
+    var cur = '';
+    sentences.forEach(function(s){
+      if(s.length > maxLen){
+        // a single "sentence" is itself too long (no punctuation) — hard-split it
+        if(cur){ chunks.push(cur); cur = ''; }
+        for(var i=0;i<s.length;i+=maxLen){ chunks.push(s.slice(i, i+maxLen)); }
+        return;
+      }
+      if((cur+s).length > maxLen){
+        chunks.push(cur);
+        cur = s;
+      } else {
+        cur += s;
+      }
+    });
+    if(cur) chunks.push(cur);
+    return chunks.map(function(c){ return c.trim(); }).filter(Boolean);
+  }
+  function translateChunk(chunk){
+    return fetch('https://api.mymemory.translated.net/get?q='+encodeURIComponent(chunk)+'&langpair=en|vi')
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        var t = data && data.responseData && data.responseData.translatedText;
+        return t || '(không dịch được đoạn này)';
+      })
+      .catch(function(){ return '⚠ Lỗi kết nối dịch đoạn này.'; });
+  }
+  function doDictLookup(text, rect){
+    if(!text) return;
+    text = text.trim().replace(/\s+/g,' ');
+    if(!text) return;
+    var MAX_LOOKUP = 3000;
+    if(text.length > MAX_LOOKUP) text = text.slice(0, MAX_LOOKUP);
+
+    var isLong = text.length > 70;
+    if(!isLong){
+      showDictPopup('<b>'+dictEsc(text)+'</b><br>Đang dịch…', rect, false);
+      translateChunk(text).then(function(t){
+        showDictPopup('<b>'+dictEsc(text)+'</b><br>→ '+dictEsc(t), rect, false);
+      });
+      return;
+    }
+
+    // Long passage: chunk it, translate sequentially, render full original +
+    // full translation (both scrollable) so nothing gets cut short.
+    var chunks = splitIntoChunks(text, 450);
+    var translated = new Array(chunks.length).fill('');
+    function render(progressIdx){
+      var status = (progressIdx < chunks.length)
+        ? '<div class="dict-progress">Đang dịch… ('+(progressIdx+1)+'/'+chunks.length+')</div>' : '';
+      var html = '<div class="dict-orig"><b>Đoạn gốc:</b><br>'+dictEsc(text)+'</div>'
+        + '<div class="dict-trans"><b>Bản dịch:</b><br>'+dictEsc(translated.join(' ').trim() || '…')+'</div>'
+        + status;
+      showDictPopup(html, rect, true);
+    }
+    render(0);
+    var chain = Promise.resolve();
+    chunks.forEach(function(chunk, idx){
+      chain = chain.then(function(){
+        return translateChunk(chunk).then(function(t){
+          translated[idx] = t;
+          render(idx+1);
+        });
+      });
+    });
+  }
+
+  function enablePostExamTools(){
+    var tag = document.getElementById('dictModeTag');
+    if(tag) tag.classList.add('show');
+    var hlbar = document.getElementById('hlToolbar');
+    if(hlbar) hlbar.style.display = 'none';
+    var b = document.getElementById('warnBanner');
+    if(b) b.style.display = 'none';
+    var ov = document.getElementById('fsOverlay');
+    if(ov) ov.style.display = 'none';
+    document.body.classList.remove('pen-mode');
+    penMode = false; penEraseMode = false;
+    var pb = document.getElementById('penBtn'); if(pb) pb.classList.remove('active');
+    document.querySelectorAll('.pen-color-btn, #penEraserBtn').forEach(function(b){ b.classList.remove('show','active'); });
+    drawLayers.forEach(function(entry){ entry.svg.classList.remove('pen-active','pen-erase'); });
+    document.querySelectorAll('.explain-panel').forEach(function(p){ p.style.display = 'block'; });
+  }
+
+  /* ---------------- Grading helpers ---------------- */
+  function getRadio(name){
+    var el = document.querySelector('input[name="'+name+'"]:checked');
+    return el ? el.value : '';
+  }
+  function getChecked(name){
+    var out = [];
+    document.querySelectorAll('input[name="'+name+'"]:checked').forEach(function(el){ out.push(el.value); });
+    return out;
+  }
+  function getSelect(name){
+    var el = document.getElementById(name);
+    return el ? el.value : '';
+  }
+  function getText(name){
+    var el = document.getElementById(name);
+    return el ? el.value : '';
+  }
+  function textMatches(val, ansArr){
+    var v = norm(val);
+    if(!v) return false;
+    for(var i=0;i<ansArr.length;i++){ if(norm(ansArr[i])===v) return true; }
+    return false;
+  }
+
+  /* ---------------- Submit flow ---------------- */
+  window.requestSubmit = function(){
+    document.getElementById('confirmModal').classList.remove('hidden');
+  };
+  window.cancelSubmit = function(){
+    document.getElementById('confirmModal').classList.add('hidden');
+  };
+  window.confirmSubmit = function(){
+    document.getElementById('confirmModal').classList.add('hidden');
+    doSubmit();
+  };
+
+  function passageIndexOfQ(n){
+    var c = PASSAGE_COUNTS, acc = 0;
+    for(var i=0;i<3;i++){ acc += c[i]; if(n<=acc) return i; }
+    return 2;
+  }
+
+  function doSubmit(){
+    if(submitted) return;
+    submitted = true;
+    window.getViolationLog();
+    window.stopTimer();
+    var box = document.getElementById('timerBox');
+    if(box) box.style.display = 'none';
+    var tuModal = document.getElementById('timeUpModal');
+    if(tuModal) tuModal.classList.add('hidden');
+
+    var pScore = [0,0,0], pTotal = PASSAGE_COUNTS.slice();
+    var totalCorrect = 0;
+    var detailsParts = [];
+    var doneGroups = {};
+
+    UNITS.forEach(function(u){
+      if(u.type==='checkboxGroup'){
+        if(doneGroups[u.group]) return;
+        doneGroups[u.group] = true;
+        var chosen = getChecked(u.group);
+        var correct = ANS[u.group];
+        var matched = chosen.filter(function(v){ return correct.indexOf(v)!==-1; });
+        var score = Math.min(matched.length, u.max);
+        var pIdx = passageIndexOfQ(u.members[0]);
+        pScore[pIdx] += score;
+        totalCorrect += score;
+        // color options
+        document.querySelectorAll('input[name="'+u.group+'"]').forEach(function(inp){
+          var label = inp.closest('.opt-row');
+          if(!label) return;
+          if(inp.checked && correct.indexOf(inp.value)!==-1) label.classList.add('correct');
+          else if(inp.checked && correct.indexOf(inp.value)===-1) label.classList.add('incorrect');
+          else if(!inp.checked && correct.indexOf(inp.value)!==-1) label.style.outline = '2px dashed #e8b800';
+        });
+        var parts = chosen.map(function(v){ return v + (correct.indexOf(v)>=0 ? '✔' : '✘'); });
+        var missed = correct.filter(function(v){ return chosen.indexOf(v)<0; }).map(function(v){ return v+'(đáp án)'; });
+        detailsParts.push('Q'+u.members.join('-')+':['+parts.concat(missed).join(' ')+']');
+        return;
+      }
+      var n = u.n;
+      var pIdx = passageIndexOfQ(n);
+      var ok = false, val = '';
+      if(u.type==='radio'){
+        val = getRadio('q'+n);
+        ok = (val === ANS[n]);
+        document.querySelectorAll('input[name="q'+n+'"]').forEach(function(inp){
+          var label = inp.closest('.opt-row');
+          if(!label) return;
+          if(inp.value === ANS[n]) label.classList.add('correct');
+          else if(inp.checked) label.classList.add('incorrect');
+        });
+      } else if(u.type==='select'){
+        val = getSelect('q'+n);
+        ok = (val === ANS[n]);
+        var sel = document.getElementById('q'+n);
+        if(sel) sel.classList.add(ok?'correct-cell':'incorrect-cell');
+      } else { // text
+        val = getText('q'+n);
+        ok = textMatches(val, ANS[n]);
+        var inp2 = document.getElementById('q'+n);
+        if(inp2) inp2.classList.add(ok?'correct-cell':'incorrect-cell');
+        if(!ok){
+          var hint = document.getElementById('hint-q'+n);
+          if(hint) hint.textContent = ' (Đáp án: ' + ANS[n][0] + ')';
+        }
+      }
+      if(ok){ pScore[pIdx]++; totalCorrect++; }
+      detailsParts.push('Q'+n+':'+(ok?'✔':'✘')+'('+val+')');
+    });
+
+    // lock inputs
+    document.querySelectorAll('input,select,textarea').forEach(function(el){
+      if(el.id==='stuName'||el.id==='stuClass') return;
+      el.disabled = true;
+    });
+
+    enablePostExamTools();
+
+    var total = TOTAL_QUESTIONS;
+    var band = computeBand(totalCorrect, total);
+    var elapsedMs = Date.now() - window._testStartTime;
+    var elapsedMin = Math.floor(elapsedMs/60000), elapsedSec = Math.floor((elapsedMs%60000)/1000);
+    var timeTaken = elapsedMin+' phút '+elapsedSec+' giây';
+
+    showResult(pScore, pTotal, totalCorrect, total, band, timeTaken);
+
+    var vlog = { tabViolations: tabViolations, focusViolations: focusViolations, fsViolations: fsViolations };
+    var payload = {
+      action: 'save_result',
+      timestamp: new Date().toISOString(),
+      student: window._studentName + ' — ' + window._studentClass,
+      test: 'Reading Test ' + TEST_NUM,
+      score: totalCorrect,
+      total: total,
+      band: band,
+      timeTaken: timeTaken,
+      p1score: pScore[0]+'/'+pTotal[0],
+      p2score: pScore[1]+'/'+pTotal[1],
+      p3score: pScore[2]+'/'+pTotal[2],
+      tabViol: vlog.tabViolations,
+      focusViol: vlog.focusViolations,
+      fsViol: vlog.fsViolations,
+      details: detailsParts.join(' | ')
+    };
+    fetch(APPS_SCRIPT_URL, {
+      method:'POST', mode:'no-cors',
+      headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body: JSON.stringify(payload)
+    }).catch(function(){});
+  }
+
+  function computeBand(score, total){
+    var s = Math.round(score/total*40);
+    if(s>=39) return '9';
+    if(s>=37) return '8.5';
+    if(s>=35) return '8';
+    if(s>=33) return '7.5';
+    if(s>=30) return '7';
+    if(s>=27) return '6.5';
+    if(s>=23) return '6';
+    if(s>=19) return '5.5';
+    if(s>=15) return '5';
+    if(s>=13) return '4.5';
+    if(s>=10) return '4';
+    return '< 4';
+  }
+
+  function showResult(pScore, pTotal, totalCorrect, total, band, timeTaken){
+    var box = document.getElementById('resultBox');
+    var html = '<h3>Kết quả bài thi</h3>';
+    html += '<p>Thí sinh: <b>'+esc(window._studentName)+'</b> — Lớp: <b>'+esc(window._studentClass)+'</b></p>';
+    html += '<p>Thời gian làm bài: <b>'+timeTaken+'</b></p>';
+    html += '<table><tr><th>Passage</th><th>Điểm</th></tr>';
+    for(var i=0;i<3;i++){ html += '<tr><td>Passage '+(i+1)+'</td><td>'+pScore[i]+'/'+pTotal[i]+'</td></tr>'; }
+    html += '<tr><td><b>Tổng điểm</b></td><td><b>'+totalCorrect+'/'+total+'</b></td></tr></table>';
+    html += '<p>Band ước tính: <span class="band-badge">Band '+band+'</span></p>';
+    html += '<p style="font-size:12.5px;color:#667;">Báo cáo vi phạm — Chuyển tab: '+tabViolations+' | Mất focus: '+focusViolations+' | Thoát fullscreen: '+fsViolations+'</p>';
+    html += '<p style="font-size:12.5px;color:#667;">Các ô được tô <span style="color:var(--green);font-weight:700;">xanh</span> là đáp án đúng, tô <span style="color:var(--red);font-weight:700;">đỏ</span> là sai. Đáp án đúng bị bỏ sót (checkbox) được viền nét đứt vàng.</p>';
+    box.innerHTML = html;
+    document.getElementById('resultModal').classList.remove('hidden');
+  }
+  window.closeResult = function(){
+    document.getElementById('resultModal').classList.add('hidden');
+  };
+  function esc(s){
+    return String(s).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+
+  /* ---------------- Init (script is at end of body, DOM already ready — wire directly) ---------------- */
+  initHighlightToolbar();
+  initHighlightZones();
+  initSelectedAnswerHighlight();
+  initDrawLayers();
+  initPenTool();
+  initDivider();
+  if(window.CHECKBOX_GROUPS){
+    window.CHECKBOX_GROUPS.forEach(function(g){ window.wireCheckboxLimit(g.name, g.max); });
+  }
+
+})();
+
+</script>
+</body>
+</html>

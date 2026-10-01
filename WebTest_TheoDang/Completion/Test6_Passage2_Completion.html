@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Test 6 — Passage 2: Should we try to bring extinct species back to life?</title>
+<style>
+:root{
+  --blue:#1a56b0; --blue-dark:#123e82; --green:#1e8e3e; --red:#d93025; --orange:#e8710a;
+  --gray-bg:#f4f6f8; --border:#d7dde3; --hl-yellow:#FFE066; --hl-green:#90EE90; --hl-pink:#FFB6C1;
+  --sel-orange:#FFD580;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;height:100%;font-family:"Segoe UI",Arial,sans-serif;color:#1b1f23;background:#fff;}
+body{user-select:none;}
+input[type="text"],select,textarea{user-select:text;}
+.passage-panel, .question-panel{user-select:text;}
+input,select,textarea{font-family:inherit;font-size:14px;}
+@media print{ body{display:none !important;} }
+
+/* ---------- Popup ---------- */
+#nameOverlay{position:fixed;inset:0;background:rgba(10,20,40,.78);display:flex;align-items:center;justify-content:center;z-index:9999;}
+#nameOverlay.hidden{display:none;}
+.name-box{background:#fff;padding:28px 32px;border-radius:10px;width:360px;max-width:92vw;box-shadow:0 12px 40px rgba(0,0,0,.3);}
+.name-box h2{margin:0 0 6px;font-size:19px;color:var(--blue-dark);}
+.name-box p.sub{margin:0 0 18px;font-size:13px;color:#556;}
+.name-box label{display:block;font-size:13px;font-weight:600;margin:10px 0 4px;}
+.name-box input{width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:6px;font-size:14px;user-select:text;}
+.name-box .err{color:var(--red);font-size:12.5px;min-height:18px;margin-top:8px;}
+.name-box button{margin-top:10px;width:100%;padding:11px;background:var(--blue);color:#fff;border:none;border-radius:6px;font-size:15px;font-weight:600;cursor:pointer;}
+.name-box button:hover{background:var(--blue-dark);}
+
+/* ---------- Header ---------- */
+#topbar{position:sticky;top:0;z-index:500;background:#fff;border-bottom:1px solid var(--border);}
+#hlToolbar{display:flex;align-items:center;gap:8px;padding:6px 14px;background:#eef2f7;border-bottom:1px solid var(--border);flex-wrap:wrap;}
+#hlToolbar .lbl{font-size:12.5px;color:#556;margin-right:4px;}
+.hl-btn{width:28px;height:28px;border-radius:50%;border:2px solid transparent;cursor:pointer;}
+.hl-btn[data-c="yellow"]{background:var(--hl-yellow);}
+.hl-btn[data-c="green"]{background:var(--hl-green);}
+.hl-btn[data-c="pink"]{background:var(--hl-pink);}
+.hl-btn.active{border-color:#333;transform:scale(1.15);}
+#eraserBtn{padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:#fff;cursor:pointer;font-size:13px;}
+#eraserBtn.active{background:#333;color:#fff;}
+#penBtn{padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:#fff;cursor:pointer;font-size:13px;}
+#penBtn.active{background:#8a5b00;color:#fff;}
+.pen-color-btn{width:22px;height:22px;border-radius:50%;border:2px solid transparent;cursor:pointer;display:none;vertical-align:middle;}
+.pen-color-btn.show{display:inline-block;}
+.pen-color-btn[data-pc="red"]{background:#e53935;}
+.pen-color-btn[data-pc="blue"]{background:#1e88e5;}
+.pen-color-btn[data-pc="black"]{background:#222;}
+.pen-color-btn.active{border-color:#333;transform:scale(1.15);}
+#penEraserBtn{padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:#fff;cursor:pointer;font-size:13px;display:none;}
+#penEraserBtn.show{display:inline-block;}
+#penEraserBtn.active{background:#333;color:#fff;}
+#dictModeTag{display:none;font-size:12px;color:var(--green);font-weight:700;padding:4px 10px;background:#e6f6ea;border-radius:6px;}
+#dictModeTag.show{display:inline-block;}
+.hl-yellow{background:var(--hl-yellow);}
+.hl-green{background:var(--hl-green);}
+.hl-pink{background:var(--hl-pink);}
+
+#header{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;}
+#tabs{display:flex;gap:6px;}
+.tab-btn{padding:8px 16px;border:1px solid var(--border);background:#f4f6f8;border-radius:6px 6px 0 0;cursor:pointer;font-size:14px;font-weight:600;color:#445;}
+.tab-btn.active{background:var(--blue);color:#fff;border-color:var(--blue);}
+#timerBox{font-size:20px;font-weight:700;padding:6px 14px;border-radius:8px;background:#eef2f7;color:var(--blue-dark);min-width:110px;text-align:center;}
+#timerBox.warn{background:#fff3cd;color:#8a5b00;animation:blink 1s infinite;}
+#timerBox.danger{background:#fbe0de;color:var(--red);animation:blink .5s infinite;}
+@keyframes blink{50%{opacity:.4;}}
+
+/* ---------- Layout ---------- */
+#examArea{display:flex;height:calc(100vh - 128px);}
+.passage-panel{width:50%;overflow-y:auto;padding:18px 22px;border-right:none;background:#fff;}
+#divider{width:6px;cursor:col-resize;background:var(--border);flex-shrink:0;}
+#divider:hover{background:var(--blue);}
+.question-panel{width:50%;overflow-y:auto;padding:18px 22px;background:#fbfcfe;}
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+.passage-title{font-size:19px;font-weight:700;color:var(--blue-dark);margin:4px 0 12px;}
+.passage-instr{font-style:italic;font-size:13px;color:#556;margin-bottom:14px;}
+.passage-panel p{line-height:1.65;margin:0 0 12px;text-align:justify;}
+.subheading{display:inline-block;font-weight:700;color:var(--blue-dark);margin-right:6px;}
+.footnote{font-size:12.5px;color:#667;}
+
+.qgroup{margin-bottom:26px;padding-bottom:18px;border-bottom:1px dashed var(--border);}
+.qgroup:last-child{border-bottom:none;}
+.qgroup h3{font-size:14.5px;margin:0 0 4px;color:var(--blue-dark);}
+.qgroup .instr{font-size:13px;color:#445;margin:0 0 10px;line-height:1.5;}
+.qitem{margin:10px 0;font-size:14px;line-height:1.6;}
+.qnum{display:inline-block;min-width:24px;font-weight:700;color:var(--blue-dark);}
+.opt-row{display:block;margin:4px 0 4px 26px;padding:3px 6px;border-radius:5px;cursor:pointer;}
+.opt-row input{margin-right:8px;}
+.opt-row.selected-answer{background:var(--sel-orange);}
+.opt-row.correct{background:#c8f0d0 !important;}
+.opt-row.incorrect{background:#f8d3d0 !important;}
+select.qselect{padding:5px 6px;border:1px solid var(--border);border-radius:5px;font-size:13.5px;margin-left:6px;min-width:150px;}
+input.qtext{padding:4px 7px;border:1px solid var(--border);border-radius:4px;font-size:13.5px;width:150px;margin:0 3px;}
+input.qtext.correct-cell{background:#c8f0d0;border-color:var(--green);}
+input.qtext.incorrect-cell{background:#f8d3d0;border-color:var(--red);}
+.ans-hint{font-size:12px;color:var(--green);font-weight:600;margin-left:6px;}
+.qnum-inline{display:inline-block;min-width:20px;color:#fff;background:var(--blue);border-radius:4px;font-size:11.5px;text-align:center;padding:1px 4px;margin:0 4px 0 2px;vertical-align:middle;}
+.headinglist, .wordbank, .keylist{background:#eef2f7;border:1px solid var(--border);border-radius:6px;padding:10px 14px;margin-bottom:12px;font-size:13.5px;line-height:1.65;}
+.headinglist div, .wordbank span, .keylist div{margin:2px 0;}
+.wordbank span{display:inline-block;margin-right:16px;}
+table.qtable{width:100%;border-collapse:collapse;margin:10px 0;font-size:13.5px;}
+table.qtable td, table.qtable th{border:1px solid var(--border);padding:7px 9px;vertical-align:top;text-align:left;}
+table.qtable th{background:#eef2f7;}
+.notebox{background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:14px 18px;margin:10px 0;}
+.notebox h4{margin:12px 0 6px;font-size:14px;color:var(--blue-dark);}
+.notebox h4:first-child{margin-top:0;}
+.notebox ul{margin:4px 0 8px;padding-left:20px;}
+.notebox li{margin:4px 0;font-size:13.5px;line-height:1.6;}
+.summarybox{background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:14px 18px;margin:10px 0;font-size:13.5px;line-height:1.85;}
+.summarybox .stitle{font-weight:700;color:var(--blue-dark);display:block;margin-bottom:8px;}
+
+@media (max-width:768px){
+  #examArea{flex-direction:column;height:auto;}
+  .passage-panel, .question-panel{width:100%;height:60vh;}
+  #divider{display:none;}
+  .tab-btn{padding:7px 10px;font-size:12.5px;}
+}
+
+/* ---------- Submit / violation ---------- */
+#submitBtn{position:fixed;right:22px;bottom:22px;z-index:600;background:var(--red);color:#fff;border:none;padding:14px 24px;border-radius:30px;font-size:15px;font-weight:700;box-shadow:0 6px 18px rgba(0,0,0,.25);cursor:pointer;}
+#submitBtn:hover{background:#a80f00;}
+.modal-overlay{position:fixed;inset:0;background:rgba(10,20,40,.65);display:flex;align-items:center;justify-content:center;z-index:9998;}
+.modal-overlay.hidden{display:none;}
+.modal-box{background:#fff;border-radius:10px;padding:24px 26px;width:420px;max-width:92vw;box-shadow:0 12px 40px rgba(0,0,0,.3);}
+.modal-box h3{margin:0 0 10px;color:var(--blue-dark);}
+.modal-actions{display:flex;gap:10px;margin-top:18px;}
+.modal-actions button{flex:1;padding:10px;border-radius:6px;border:none;font-size:14px;font-weight:600;cursor:pointer;}
+.btn-confirm{background:var(--red);color:#fff;}
+.btn-cancel{background:#e4e8ec;color:#333;}
+#resultBox{max-height:70vh;overflow-y:auto;}
+#resultBox table{width:100%;border-collapse:collapse;margin:10px 0;font-size:13.5px;}
+#resultBox td,#resultBox th{border:1px solid var(--border);padding:6px 8px;}
+.band-badge{display:inline-block;background:var(--blue);color:#fff;padding:4px 12px;border-radius:20px;font-weight:700;font-size:15px;}
+#warnBanner{position:fixed;top:0;left:0;right:0;background:var(--red);color:#fff;text-align:center;padding:8px;font-weight:700;z-index:9997;display:none;}
+#fsOverlay{position:fixed;inset:0;background:rgba(10,20,40,.9);color:#fff;display:none;align-items:center;justify-content:center;flex-direction:column;z-index:9996;text-align:center;padding:20px;}
+#fsOverlay button{margin-top:16px;padding:10px 20px;border-radius:6px;border:none;background:var(--blue);color:#fff;font-weight:700;cursor:pointer;font-size:14px;}
+
+/* ---------- Pen (freehand drawing) tool ---------- */
+.passage-panel, .question-panel{position:relative;}
+.draw-layer{position:absolute;top:0;left:0;width:100%;pointer-events:none;z-index:40;}
+.draw-layer.pen-active{pointer-events:auto;cursor:crosshair;}
+.draw-layer.pen-erase{pointer-events:auto;cursor:cell;}
+body.pen-mode .passage-panel, body.pen-mode .question-panel{cursor:crosshair;}
+
+/* ---------- Dictionary popup (post-submit) ---------- */
+.dict-popup{position:fixed;max-width:320px;background:#1b1f23;color:#fff;padding:10px 14px;border-radius:8px;font-size:13px;line-height:1.5;z-index:9995;box-shadow:0 8px 24px rgba(0,0,0,.3);}
+.dict-popup.dict-popup-wide{max-width:480px;}
+.dict-popup b{color:#7fd0ff;}
+.dict-popup .dict-close{position:absolute;top:2px;right:8px;cursor:pointer;color:#aaa;font-size:14px;}
+.dict-popup .dict-body{max-height:56vh;overflow-y:auto;padding-right:4px;}
+.dict-popup .dict-orig{margin-bottom:8px;color:#c9d6e3;}
+.dict-popup .dict-trans{color:#d8ffe0;border-top:1px solid #333;padding-top:8px;}
+.dict-popup .dict-progress{margin-top:8px;color:#ffd166;font-size:12px;font-style:italic;}
+
+/* ---------- Explanation panel (post-submit) ---------- */
+.explain-panel{display:none;margin-top:20px;padding-top:14px;border-top:2px solid var(--blue);}
+.explain-panel h3{color:var(--blue-dark);font-size:15px;margin:0 0 10px;}
+.explain-item{background:#f0f6ff;border:1px solid #cfe0f5;border-radius:6px;padding:8px 12px;margin-bottom:8px;font-size:13px;line-height:1.55;}
+.explain-item b.eq{color:var(--blue-dark);}
+.explain-item .eans{color:var(--green);font-weight:700;}
+.explain-item .etext{color:#334;display:block;margin-top:6px;}
+.explain-item .equote{display:block;margin-top:5px;margin-bottom:2px;font-style:italic;color:#4a5568;background:#fff;border-left:3px solid var(--blue);padding:4px 10px;border-radius:0 4px 4px 0;}
+.explain-item .elang{display:inline-block;font-size:10.5px;font-weight:800;letter-spacing:.03em;color:#fff;background:var(--blue);border-radius:4px;padding:1px 6px;margin-right:6px;vertical-align:middle;}
+.explain-item .etext-vi .elang{background:var(--green);}
+.explain-item .etext-en{font-style:normal;}
+
+#tabs{display:flex;align-items:center;gap:10px;}
+.qtype-badge{background:var(--blue,#0b3d91);color:#fff;font-weight:700;font-size:13px;padding:6px 12px;border-radius:6px;}
+.source-badge{font-size:12.5px;color:#445;font-weight:600;}
+
+</style>
+</head>
+<body>
+
+<div id="nameOverlay">
+  <div class="name-box">
+    <h2>Test 6 — Passage 2: Should we try to bring extinct species back to life?</h2>
+    <p class="sub">Vui lòng nhập thông tin để bắt đầu làm bài (thời gian: 30 phút, 5 câu hỏi).</p>
+    <label>Họ và tên</label>
+    <input type="text" id="stuName" placeholder="Nguyễn Văn A">
+    <label>Lớp</label>
+    <input type="text" id="stuClass" placeholder="10A1">
+    <div class="err" id="nameErr"></div>
+    <button onclick="startExam()">Bắt đầu làm bài</button>
+  </div>
+</div>
+
+<div id="warnBanner"></div>
+<div id="fsOverlay">
+  <div>⚠ Bạn đã thoát chế độ toàn màn hình. Vi phạm đã được ghi nhận.</div>
+  <button onclick="enterFullscreen()">Vào toàn màn hình</button>
+</div>
+
+<div id="topbar">
+  <div id="hlToolbar">
+    <span class="lbl">Highlight:</span>
+    <button class="hl-btn" data-c="yellow" title="Vàng"></button>
+    <button class="hl-btn" data-c="green" title="Xanh lá"></button>
+    <button class="hl-btn" data-c="pink" title="Hồng"></button>
+    <button id="eraserBtn" title="Tẩy">🧹 Tẩy</button>
+    <button id="penBtn" title="Bút viết">🖊️ Bút</button>
+    <button class="pen-color-btn" data-pc="red" title="Đỏ"></button>
+    <button class="pen-color-btn" data-pc="blue" title="Xanh dương"></button>
+    <button class="pen-color-btn" data-pc="black" title="Đen"></button>
+    <button id="penEraserBtn" title="Xóa nét bút">🧽 Xóa nét</button>
+    <span id="dictModeTag">📖 Đã mở tra từ: click đúp vào từ hoặc bôi đen đoạn văn để dịch</span>
+  </div>
+  <div id="header">
+    <div id="tabs">
+      <span class="qtype-badge">COMPLETION</span>
+      <span class="source-badge">Test 6 — Passage 2: Should we try to bring extinct species back to life?</span>
+    </div>
+    <div id="timerBox">30:00</div>
+  </div>
+</div>
+
+<div id="examArea">
+  <div class="passage-panel tab-content active" id="passage-0"><div class="passage-title">Should we try to bring extinct species back to life?</div>
+<div class="passage-instr">You should spend about 20 minutes on Questions 14-26, which are based on Reading Passage 2 below.</div>
+<p><span class="subheading">A</span>	The passenger pigeon was a legendary species. Flying in vast numbers across North America, with potentially many millions within a single flock, their migration was once one of nature's great spectacles. Sadly, the passenger pigeon's existence came to an end on 1 September 1914, when the last living specimen died at Cincinnati Zoo. Geneticist Ben Novak is lead researcher on an ambitious project which now aims to bring the bird back to life through a process known as 'deextinction'. The basic premise involves using cloning technology to turn the DNA of extinct animals into a fertilised embryo, which is carried by the nearest relative still in existence - in this case, the abundant band-tailed pigeon - before being born as a living, breathing animal. Passenger pigeons are one of the pioneering species in this field, but they are far from the only ones on which this cutting-edge technology is being trialled.</p>
+<p><span class="subheading">B</span>	In Australia, the thylacine, more commonly known as the Tasmanian tiger, is another extinct creature which genetic scientists are striving to bring back to life. 'There is no carnivore now in Tasmania that fills the niche which thylacines once occupied,' explains Michael Archer of the University of New South Wales. He points out that in the decades since the thylacine went extinct, there has been a spread in a 'dangerously debilitating' facial tumour syndrome which threatens the existence of the Tasmanian devils, the island's other notorious resident. Thylacines would have prevented this spread because they would have killed significant numbers of Tasmanian devils. 'If that contagious cancer had popped up previously, it would have burned out in whatever region it started. The return of thylacines to Tasmania could help to ensure that devils are never again subjected to risks of this kind.'</p>
+<p><span class="subheading">C</span>	If extinct species can be brought back to life, can humanity begin to correct the damage it has caused to the natural world over the past few millennia? 'The idea of de-extinction is that we can reverse this process, bringing species that no longer exist back to life,' says Beth Shapiro of University of California Santa Cruz's Genomics Institute. 'I don't think that we can do this. There is no way to bring back something that is 100 per cent identical to a species that went extinct a long time ago.' A more practical approach for long-extinct species is to take the DNA of existing species as a template, ready for the insertion of strands of extinct animal DNA to create something new; a hybrid, based on the living species, but which looks and/or acts like the animal which died out.</p>
+<p><span class="subheading">D</span>	This complicated process and questionable outcome begs the question: what is the actual point of this technology? 'For us, the goal has always been replacing the extinct species with a suitable replacement,' explains Novak. 'When it comes to breeding, band-tailed pigeons scatter and make maybe one or two nests per hectare, whereas passenger pigeons were very social and would make 10,000 or more nests in one hectare.' Since the disappearance of this key species, ecosystems in the eastern US have suffered, as the lack of disturbance caused by thousands of passenger pigeons wrecking trees and branches means there has been minimal need for regrowth. This has left forests stagnant and therefore unwelcoming to the plants and animals which evolved to help regenerate the forest after a disturbance. According to Novak, a hybridised band-tailed pigeon, with the added nesting habits of a passenger pigeon, could, in theory, re-establish that forest disturbance, thereby creating a habitat necessary for a great many other native species to thrive.</p>
+<p><span class="subheading">E</span>	Another popular candidate for this technology is the woolly mammoth. George Church, professor at Harvard Medical School and leader of the Woolly Mammoth Revival Project, has been focusing on cold resistance, the main way in which the extinct woolly mammoth and its nearest living relative, the Asian elephant, differ. By pinpointing which genetic traits made it possible for mammoths to survive the icy climate of the tundra, the project's goal is to return mammoths, or a mammothlike species, to the area. 'My highest priority would be preserving the endangered Asian elephant,' says Church, 'expanding their range to the huge ecosystem of the tundra. Necessary adaptations would include smaller ears, thicker hair, and extra insulating fat, all for the purpose of reducing heat loss in the tundra, and all traits found in the now extinct woolly mammoth.' This repopulation of the tundra and boreal forests of Eurasia and North America with large mammals could also be a useful factor in reducing carbon emissions - elephants punch holes through snow and knock down trees, which encourages grass growth. This grass growth would reduce temperatures, and mitigate emissions from melting permafrost.</p>
+<p><span class="subheading">F</span>	While the prospect of bringing extinct animals back to life might capture imaginations, it is, of course, far easier to try to save an existing species which is merely threatened with extinction. 'Many of the technologies that people have in mind when they think about de-extinction can be used as a form of “genetic rescue”,' explains Shapiro. She prefers to focus the debate on how this emerging technology could be used to fully understand why various species went extinct in the first place, and therefore how we could use it to make genetic modifications which could prevent mass extinctions in the future. 'I would also say there's an incredible moral hazard to not do anything at all,' she continues. 'We know that what we are doing today is not enough, and we have to be willing to take some calculated and measured risks.'</p>
+</div>
+  <div class="question-panel tab-content active" id="questions-0">
+<div class="qgroup">
+<h3>Questions 18-22</h3>
+<div class="instr">Complete the summary below.</div>
+<div class="instr">Choose NO MORE THAN TWO WORDS from the passage for each answer.</div>
+<div class="instr">Write your answers in boxes 18-22 on your answer sheet.</div>
+<div class="summarybox"><span class="stitle">The woolly mammoth revival project</span>Professor George Church and his team are trying to identify the <b class="qnum-inline">18</b><input type="text" class="qtext" id="q18" autocomplete="off"><span id="hint-q18"></span> which enabled mammoths to live in the tundra. The findings could help preserve the mammoth’s close relative, the endangered Asian elephant. According to Church, introducing Asian elephants to the tundra would involve certain physical adaptations to minimise <b class="qnum-inline">19</b><input type="text" class="qtext" id="q19" autocomplete="off"><span id="hint-q19"></span>. To survive in the tundra, the species would need to have the mammoth-like features of thicker hair, <b class="qnum-inline">20</b><input type="text" class="qtext" id="q20" autocomplete="off"><span id="hint-q20"></span> of a reduced size and more <b class="qnum-inline">21</b><input type="text" class="qtext" id="q21" autocomplete="off"><span id="hint-q21"></span>. Repopulating the tundra with mammoths or Asian elephant/mammoth hybrids would also have an impact on the environment, which could help to reduce temperatures and decrease <b class="qnum-inline">22</b><input type="text" class="qtext" id="q22" autocomplete="off"><span id="hint-q22"></span>.</div></div>
+
+<div class="explain-panel" id="explainPanel-0"><h3>📘 Giải thích chi tiết đáp án</h3><div class="explain-item"><b class="eq">Câu 18.</b> Đáp án đúng: <span class="eans">genetic traits</span><span class="equote">&ldquo;By pinpointing which genetic traits made it possible for mammoths to survive the icy climate of the tundra, the project's goal is to return mammoths, or a mammothlike species, to the area&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Paragraph E says the project aims to pinpoint the 'genetic traits' that let mammoths survive the tundra — this matches the gap 'trying to identify the ___ which enabled mammoths to live in the tundra' → answer 'genetic traits'.</span><span class="etext etext-vi"><b class="elang">VI:</b> Đoạn E nói dự án nhắm tới việc xác định 'genetic traits' (đặc điểm di truyền) giúp voi ma mút sống được ở vùng lãnh nguyên — khớp với ô 'trying to identify the ___ which enabled mammoths to live in the tundra' → đáp án 'genetic traits'.</span></div><div class="explain-item"><b class="eq">Câu 19.</b> Đáp án đúng: <span class="eans">heat loss</span><span class="equote">&ldquo;Necessary adaptations would include smaller ears, thicker hair, and extra insulating fat, all for the purpose of reducing heat loss in the tundra&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Paragraph E says the adaptations are all for 'reducing heat loss' in the tundra — this matches the gap 'physical adaptations to minimise ___' → answer 'heat loss'.</span><span class="etext etext-vi"><b class="elang">VI:</b> Đoạn E nói các thích nghi đều nhằm mục đích 'reducing heat loss' (giảm thất thoát nhiệt) ở vùng lãnh nguyên — khớp với ô 'physical adaptations to minimise ___' → đáp án 'heat loss'.</span></div><div class="explain-item"><b class="eq">Câu 20.</b> Đáp án đúng: <span class="eans">ears</span><span class="equote">&ldquo;Necessary adaptations would include smaller ears, thicker hair, and extra insulating fat&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> The same sentence lists smaller 'ears' as one needed adaptation — this matches the gap 'thicker hair, ___ of a reduced size' → answer 'ears'.</span><span class="etext etext-vi"><b class="elang">VI:</b> Cùng câu trên liệt kê 'ears' (tai) nhỏ hơn là một trong các thích nghi cần thiết — khớp với ô 'thicker hair, ___ of a reduced size' → đáp án 'ears'.</span></div><div class="explain-item"><b class="eq">Câu 21.</b> Đáp án đúng: <span class="eans">insulating fat / fat</span><span class="equote">&ldquo;Necessary adaptations would include smaller ears, thicker hair, and extra insulating fat&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> The same sentence also lists 'extra insulating fat' — this matches the gap 'and more ___' → answer 'insulating fat' (or 'fat').</span><span class="etext etext-vi"><b class="elang">VI:</b> Cùng câu trên cũng liệt kê 'extra insulating fat' (thêm lớp mỡ cách nhiệt) — khớp với ô 'and more ___' → đáp án 'insulating fat' (hoặc 'fat').</span></div><div class="explain-item"><b class="eq">Câu 22.</b> Đáp án đúng: <span class="eans">carbon emissions / emissions</span><span class="equote">&ldquo;This grass growth would reduce temperatures, and mitigate emissions from melting permafrost&rdquo;</span><span class="etext etext-en"><b class="elang">EN:</b> Paragraph E says repopulation could help mitigate 'carbon emissions' from melting permafrost — this matches the gap 'reduce temperatures and decrease ___' → answer 'carbon emissions' (or 'emissions').</span><span class="etext etext-vi"><b class="elang">VI:</b> Đoạn E nói việc tái lập quần thể sẽ giúp giảm 'carbon emissions' (khí thải carbon) từ băng vĩnh cửu tan chảy — khớp với ô 'reduce temperatures and decrease ___' → đáp án 'carbon emissions' (hoặc 'emissions').</span></div></div>
+  </div>
+</div>
+
+<button id="submitBtn" onclick="requestSubmit()">Nộp bài</button>
+
+<div class="modal-overlay hidden" id="confirmModal">
+  <div class="modal-box">
+    <h3>Xác nhận nộp bài</h3>
+    <p>Bạn có chắc muốn nộp bài? Sau khi nộp sẽ không thể sửa lại.</p>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="cancelSubmit()">Quay lại làm bài</button>
+      <button class="btn-confirm" onclick="confirmSubmit()">Xác nhận nộp</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="warn20Modal">
+  <div class="modal-box">
+    <h3>⏰ Đã làm bài 20 phút</h3>
+    <p>Bạn đã làm bài được 20 phút, còn khoảng 10 phút nữa. Hãy kiểm tra lại tiến độ làm bài của mình.</p>
+    <div class="modal-actions">
+      <button class="btn-confirm" style="flex:none;width:100%;" onclick="dismissWarn20()">Đã hiểu, tiếp tục làm bài</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="timeUpModal">
+  <div class="modal-box">
+    <h3>⏰ Hết giờ!</h3>
+    <p>Đã hết 30 phút làm bài. Bạn có 5 phút để nộp bài, sau đó bài sẽ tự động được nộp.</p>
+    <div class="modal-actions">
+      <button class="btn-confirm" style="flex:none;width:100%;" onclick="confirmSubmit()">Nộp bài ngay</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="resultModal">
+  <div class="modal-box" style="width:560px;">
+    <div id="resultBox"></div>
+    <div class="modal-actions"><button class="btn-cancel" style="flex:none;width:100%;" onclick="closeResult()">Đóng — Xem lại bài làm</button></div>
+  </div>
+</div>
+
+<script>
+var TEST_NUM = 6;
+var TOTAL_QUESTIONS = 5;
+var PASSAGE_COUNTS = [5];
+var QTYPE = "COMPLETION";
+var TEST_SOURCE = "Test 6 — Passage 2: Should we try to bring extinct species back to life?";
+var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyfZgrcZfOw-g5nCLlQ5QyLCCADuct8QRxW31SG8F3IZfkgL0x_3LOoPWBHRFRNiXA1/exec";
+var ANS = {"18": ["genetic traits"], "19": ["heat loss"], "20": ["ears"], "21": ["insulating fat", "fat"], "22": ["carbon emissions", "emissions"]};
+var UNITS = [{"type": "text", "n": 18}, {"type": "text", "n": 19}, {"type": "text", "n": 20}, {"type": "text", "n": 21}, {"type": "text", "n": 22}];
+var CHECKBOX_GROUPS = [];
+</script>
+<script>
+/* ===================== READING TEST ENGINE — SINGLE PASSAGE BY-TYPE (shared) ===================== */
+/* Requires globals defined in the per-test <script> block BEFORE this file:
+   TEST_NUM, TOTAL_QUESTIONS, PASSAGE_COUNTS ([n]), ANS {}, UNITS [], APPS_SCRIPT_URL,
+   QTYPE (vd: "TFNG"), TEST_SOURCE (vd: "Test 1 - Passage 1: THE IMPORTANCE OF CHILDREN'S PLAY")
+*/
+(function(){
+  'use strict';
+
+  function pad(n,len){ n=String(n); while(n.length<len) n='0'+n; return n; }
+  function qLabel(n){ return 'Q.'+pad(n,2)+'.TEST'+pad(TEST_NUM,3); }
+  function norm(s){ return String(s==null?'':s).toLowerCase().trim().replace(/\s+/g,' '); }
+  window.qLabel = qLabel;
+
+  /* ---------------- Activity log → Google Sheets ---------------- */
+  function sendLog(type, detail){
+    var elapsedMs = window._testStartTime ? (Date.now() - window._testStartTime) : 0;
+    var elapsedStr = pad(Math.floor(elapsedMs/60000),2)+'m'+pad(Math.floor((elapsedMs%60000)/1000),2)+'s';
+    var payload = {
+      action: 'log_event',
+      timestamp: new Date().toISOString(),
+      student: (window._studentName||'') + ' — ' + (window._studentClass||''),
+      qtype: (typeof QTYPE!=='undefined'?QTYPE:''),
+      testSource: (typeof TEST_SOURCE!=='undefined'?TEST_SOURCE:''),
+      eventType: type,
+      detail: detail||'',
+      elapsed: elapsedStr
+    };
+    try{
+      fetch(APPS_SCRIPT_URL, {
+        method:'POST', mode:'no-cors',
+        headers:{'Content-Type':'text/plain;charset=utf-8'},
+        body: JSON.stringify(payload)
+      }).catch(function(){});
+    }catch(e){}
+  }
+  function sendLogBeacon(type, detail){
+    // used on page unload — fetch is unreliable there, sendBeacon is fire-and-forget and survives unload
+    var elapsedMs = window._testStartTime ? (Date.now() - window._testStartTime) : 0;
+    var elapsedStr = pad(Math.floor(elapsedMs/60000),2)+'m'+pad(Math.floor((elapsedMs%60000)/1000),2)+'s';
+    var payload = {
+      action: 'log_event',
+      timestamp: new Date().toISOString(),
+      student: (window._studentName||'') + ' — ' + (window._studentClass||''),
+      qtype: (typeof QTYPE!=='undefined'?QTYPE:''),
+      testSource: (typeof TEST_SOURCE!=='undefined'?TEST_SOURCE:''),
+      eventType: type,
+      detail: detail||'',
+      elapsed: elapsedStr
+    };
+    try{
+      if(navigator.sendBeacon){
+        navigator.sendBeacon(APPS_SCRIPT_URL, new Blob([JSON.stringify(payload)], {type:'text/plain;charset=utf-8'}));
+      } else {
+        sendLog(type, detail);
+      }
+    }catch(e){}
+  }
+  window._sendLog = sendLog;
+
+  /* ---------------- Popup / start ---------------- */
+  window._studentName = '';
+  window._studentClass = '';
+  window._testStartTime = null;
+  var submitted = false;
+  var timerStopped = false;
+
+  window.startExam = function(){
+    var nameEl = document.getElementById('stuName');
+    var classEl = document.getElementById('stuClass');
+    var errEl = document.getElementById('nameErr');
+    var name = nameEl.value.trim();
+    var cls = classEl.value.trim();
+    if(!name || !cls){
+      errEl.textContent = 'Vui lòng nhập đầy đủ Họ và tên và Lớp.';
+      return;
+    }
+    errEl.textContent = '';
+    window._studentName = name;
+    window._studentClass = cls;
+    window._testStartTime = Date.now();
+    document.getElementById('nameOverlay').classList.add('hidden');
+    sendLog('enter', 'Học viên vào bài — tên: ' + name + ', lớp: ' + cls);
+    window.enterFullscreen();
+  };
+
+  window.addEventListener('beforeunload', function(){
+    if(!window._testStartTime) return;
+    sendLogBeacon(submitted ? 'exit_after_submit' : 'exit_page', submitted ? 'Rời trang sau khi đã nộp bài' : 'Rời/đóng trang KHI CHƯA NỘP BÀI');
+  });
+  document.addEventListener('pagehide', function(){
+    if(!window._testStartTime) return;
+    sendLogBeacon(submitted ? 'exit_after_submit' : 'exit_page', submitted ? 'Rời trang sau khi đã nộp bài' : 'Rời/đóng trang KHI CHƯA NỘP BÀI');
+  });
+
+  /* ---------------- Fullscreen / anti-cheat ---------------- */
+  var fsViolations = 0, tabViolations = 0, focusViolations = 0;
+  var violationLog = [];
+
+  window.enterFullscreen = function(){
+    var el = document.documentElement;
+    try{
+      if(el.requestFullscreen) el.requestFullscreen().catch(function(){});
+      else if(el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+    }catch(e){}
+    var ov = document.getElementById('fsOverlay');
+    if(ov) ov.style.display = 'none';
+  };
+
+  function isFullscreen(){
+    return !!(document.fullscreenElement || document.webkitFullscreenElement);
+  }
+
+  function onFsChange(){
+    if(submitted) return;
+    if(!window._testStartTime) return;
+    if(!isFullscreen()){
+      fsViolations++;
+      violationLog.push('Thoát fullscreen lúc ' + new Date().toLocaleTimeString());
+      sendLog('fullscreen_exit', 'Lần ' + fsViolations);
+      var ov = document.getElementById('fsOverlay');
+      if(ov) ov.style.display = 'flex';
+    }
+  }
+  document.addEventListener('fullscreenchange', onFsChange);
+  document.addEventListener('webkitfullscreenchange', onFsChange);
+
+  document.addEventListener('visibilitychange', function(){
+    if(submitted || !window._testStartTime) return;
+    if(document.hidden){
+      tabViolations++;
+      violationLog.push('Chuyển tab lúc ' + new Date().toLocaleTimeString());
+      sendLog('tab_switch', 'Lần ' + tabViolations);
+      showBanner('⚠ Phát hiện chuyển tab! Vi phạm được ghi nhận.');
+    }
+  });
+
+  window.addEventListener('blur', function(){
+    if(submitted || !window._testStartTime) return;
+    focusViolations++;
+    violationLog.push('Mất focus cửa sổ lúc ' + new Date().toLocaleTimeString());
+    sendLog('focus_loss', 'Lần ' + focusViolations);
+    showBanner('⚠ Phát hiện mất focus cửa sổ! Vi phạm được ghi nhận.');
+  });
+
+  function showBanner(msg){
+    var b = document.getElementById('warnBanner');
+    if(!b) return;
+    b.textContent = msg;
+    b.style.display = 'block';
+    clearTimeout(b._t);
+    b._t = setTimeout(function(){ b.style.display = 'none'; }, 4000);
+  }
+
+  document.addEventListener('contextmenu', function(e){ if(submitted) return; e.preventDefault(); });
+  document.addEventListener('copy', function(e){ if(submitted) return; e.preventDefault(); });
+  document.addEventListener('paste', function(e){ if(submitted) return; e.preventDefault(); });
+  document.addEventListener('cut', function(e){ if(submitted) return; e.preventDefault(); });
+  document.addEventListener('dragstart', function(e){ if(submitted) return; e.preventDefault(); });
+  document.addEventListener('drop', function(e){ if(submitted) return; e.preventDefault(); });
+
+  document.addEventListener('keydown', function(e){
+    if(submitted) return;
+    var k = e.key;
+    if(k === 'F12'){ e.preventDefault(); return; }
+    if(e.ctrlKey && ['c','C','a','A','s','S','u','U','p','P','v','V'].indexOf(k) !== -1){ e.preventDefault(); return; }
+    if(e.ctrlKey && e.shiftKey && ['i','I','j','J','c','C','k','K'].indexOf(k) !== -1){ e.preventDefault(); return; }
+    if(k === 'Escape'){ e.preventDefault(); return; }
+  });
+
+  window.getViolationLog = function(){
+    submitted = true;
+    return { tabViolations: tabViolations, focusViolations: focusViolations, fsViolations: fsViolations, log: violationLog };
+  };
+  window.stopTimer = function(){ timerStopped = true; };
+
+  /* ---------------- Timer (30 phút, cảnh báo lúc 20 phút, +5 phút gia hạn rồi tự nộp) ---------------- */
+  (function(){
+    var DURATION = 30*60*1000, WARN_AT = 20*60*1000, EXTRA = 5*60*1000;
+    var startTime = null, extraTriggered = false, autoSubmitted = false, warnTriggered = false;
+    function fmt(ms){
+      if(ms<0) ms=0;
+      var s = Math.floor(ms/1000);
+      var m = Math.floor(s/60); s = s%60;
+      return pad(m,2)+':'+pad(s,2);
+    }
+    function tick(){
+      if(!startTime){
+        if(!window._testStartTime){ requestAnimationFrame(tick); return; }
+        startTime = window._testStartTime;
+      }
+      if(timerStopped) return;
+      var box = document.getElementById('timerBox');
+      var elapsed = Date.now() - startTime;
+      var remain = DURATION - elapsed;
+      if(!warnTriggered && elapsed >= WARN_AT && !extraTriggered){
+        warnTriggered = true;
+        showWarnModal();
+      }
+      if(remain <= 0 && !extraTriggered){
+        extraTriggered = true;
+        showTimeUpModal();
+        remain = 0 - (Date.now() - (startTime+DURATION));
+      }
+      if(remain <= -EXTRA && !autoSubmitted){
+        autoSubmitted = true;
+        sendLog('auto_submit_timeout', 'Hết giờ (30+5 phút) — hệ thống tự động nộp bài');
+        doSubmit();
+        return;
+      }
+      if(box){
+        var showMs = extraTriggered ? (EXTRA + (DURATION - elapsed)) : remain;
+        box.textContent = fmt(Math.max(0,showMs));
+        box.classList.remove('warn','danger');
+        if(!extraTriggered){
+          if(remain <= 2*60*1000) box.classList.add('danger');
+          else if(remain <= 10*60*1000) box.classList.add('warn');
+        } else {
+          box.classList.add('danger');
+        }
+      }
+      setTimeout(tick, 500);
+    }
+    function showTimeUpModal(){
+      sendLog('time_up', 'Hết 30 phút — còn 5 phút gia hạn trước khi tự động nộp');
+      var m = document.getElementById('timeUpModal');
+      if(m) m.classList.remove('hidden');
+    }
+    function showWarnModal(){
+      sendLog('warning_20min_shown', 'Đã làm bài 20 phút — hiện cảnh báo còn khoảng 10 phút');
+      var m = document.getElementById('warn20Modal');
+      if(m) m.classList.remove('hidden');
+    }
+    window.dismissWarn20 = function(){
+      sendLog('warning_20min_dismissed', 'Học viên đã đóng cảnh báo 20 phút, tiếp tục làm bài');
+      var m = document.getElementById('warn20Modal');
+      if(m) m.classList.add('hidden');
+    };
+    window._timerTick = tick;
+    requestAnimationFrame(tick);
+  })();
+
+  /* ---------------- Split divider ---------------- */
+  function initDivider(){
+    var dragging = false;
+    var divider = document.getElementById('divider');
+    var area = document.getElementById('examArea');
+    if(!divider) return;
+    function onMove(clientX){
+      var rect = area.getBoundingClientRect();
+      var pct = (clientX - rect.left) / rect.width * 100;
+      pct = Math.max(20, Math.min(80, pct));
+      document.querySelectorAll('.passage-panel').forEach(function(el){ el.style.width = pct+'%'; });
+      document.querySelectorAll('.question-panel').forEach(function(el){ el.style.width = (100-pct)+'%'; });
+    }
+    divider.addEventListener('mousedown', function(e){ dragging = true; e.preventDefault(); });
+    document.addEventListener('mousemove', function(e){ if(dragging) onMove(e.clientX); });
+    document.addEventListener('mouseup', function(){ dragging = false; });
+    divider.addEventListener('touchstart', function(e){ dragging = true; }, {passive:true});
+    document.addEventListener('touchmove', function(e){ if(dragging && e.touches[0]) onMove(e.touches[0].clientX); }, {passive:true});
+    document.addEventListener('touchend', function(){ dragging = false; });
+  }
+
+  /* ---------------- Highlight ---------------- */
+  var currentColor = 'yellow';
+  var eraserMode = false;
+  var penMode = false;
+  var penEraseMode = false;
+  var penColor = 'red';
+
+  function initHighlightToolbar(){
+    document.querySelectorAll('.hl-btn').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        currentColor = btn.getAttribute('data-c');
+        eraserMode = false;
+        document.querySelectorAll('.hl-btn').forEach(function(b){ b.classList.remove('active'); });
+        btn.classList.add('active');
+        document.getElementById('eraserBtn').classList.remove('active');
+      });
+    });
+    var er = document.getElementById('eraserBtn');
+    if(er) er.addEventListener('click', function(){
+      eraserMode = !eraserMode;
+      er.classList.toggle('active', eraserMode);
+    });
+    var first = document.querySelector('.hl-btn[data-c="yellow"]');
+    if(first) first.classList.add('active');
+  }
+
+  function wrapRange(range, cls){
+    var frag = range.extractContents();
+    var span = document.createElement('span');
+    span.className = cls;
+    span.appendChild(frag);
+    range.insertNode(span);
+  }
+
+  function handleMouseUp(container){
+    var sel = window.getSelection();
+    if(!sel || sel.isCollapsed || sel.rangeCount===0) return;
+    var range = sel.getRangeAt(0);
+    if(!container.contains(range.commonAncestorContainer)) return;
+    var tag = range.commonAncestorContainer.nodeType===1 ? range.commonAncestorContainer.tagName : range.commonAncestorContainer.parentElement.tagName;
+    if(['INPUT','SELECT','TEXTAREA'].indexOf(tag)!==-1) return;
+    if(submitted){
+      var rect = range.getBoundingClientRect();
+      var text = sel.toString();
+      sel.removeAllRanges();
+      doDictLookup(text, rect);
+      return;
+    }
+    if(eraserMode || penMode) return;
+    try{
+      wrapRange(range, 'hl-'+currentColor);
+    }catch(e){}
+    sel.removeAllRanges();
+  }
+
+  function handleEraseClick(e){
+    if(!eraserMode) return;
+    var el = e.target;
+    if(el.classList && (el.classList.contains('hl-yellow')||el.classList.contains('hl-green')||el.classList.contains('hl-pink'))){
+      var parent = el.parentNode;
+      while(el.firstChild) parent.insertBefore(el.firstChild, el);
+      parent.removeChild(el);
+    }
+  }
+
+  function initHighlightZones(){
+    document.querySelectorAll('.passage-panel, .question-panel').forEach(function(zone){
+      zone.addEventListener('mouseup', function(){ handleMouseUp(zone); });
+      zone.addEventListener('click', function(e){ handleEraseClick(e); });
+      zone.addEventListener('touchend', function(){ handleMouseUp(zone); });
+      zone.addEventListener('dblclick', function(){
+        if(!submitted) return;
+        var sel = window.getSelection();
+        if(!sel || sel.isCollapsed || sel.rangeCount===0) return;
+        var range = sel.getRangeAt(0);
+        var rect = range.getBoundingClientRect();
+        var text = sel.toString();
+        doDictLookup(text, rect);
+      });
+    });
+  }
+
+  /* ---------------- Selected-answer highlight ---------------- */
+  function initSelectedAnswerHighlight(){
+    document.querySelectorAll('input[type=radio], input[type=checkbox]').forEach(function(inp){
+      inp.addEventListener('change', function(){
+        var label = inp.closest('.opt-row');
+        if(inp.type==='radio'){
+          document.querySelectorAll('input[name="'+inp.name+'"]').forEach(function(o){
+            var l = o.closest('.opt-row');
+            if(l) l.classList.remove('selected-answer');
+          });
+          if(inp.checked && label) label.classList.add('selected-answer');
+        } else {
+          if(label) label.classList.toggle('selected-answer', inp.checked);
+        }
+      });
+    });
+  }
+
+  /* ---------------- Checkbox group max-limit ---------------- */
+  window.wireCheckboxLimit = function(name, max){
+    function showLimit(){
+      var id = 'chk-limit-'+name;
+      var el = document.getElementById(id);
+      if(!el){
+        el = document.createElement('div');
+        el.id = id;
+        el.style.cssText = 'color:#e74c3c;font-size:12px;font-weight:bold;margin-top:4px;';
+        var grp = document.querySelector('input[name="'+name+'"]');
+        if(grp && grp.parentNode && grp.parentNode.parentNode) grp.parentNode.parentNode.appendChild(el);
+      }
+      el.textContent = '⚠ Chỉ được chọn tối đa ' + max + ' đáp án!';
+      clearTimeout(el._t);
+      el._t = setTimeout(function(){ el.textContent=''; }, 2500);
+    }
+    document.querySelectorAll('input[name="'+name+'"]').forEach(function(inp){
+      inp.addEventListener('change', function(){
+        if(inp.checked){
+          var n = document.querySelectorAll('input[name="'+name+'"]:checked').length;
+          if(n>max){ inp.checked=false; inp.dispatchEvent(new Event('_uncheck')); showLimit();
+            var label = inp.closest('.opt-row'); if(label) label.classList.remove('selected-answer');
+          }
+        }
+      });
+    });
+  };
+
+  /* ---------------- Pen (freehand drawing) tool ---------------- */
+  var SVG_NS = 'http://www.w3.org/2000/svg';
+  var drawLayers = []; // {zone, svg}
+
+  function initDrawLayers(){
+    document.querySelectorAll('.passage-panel, .question-panel').forEach(function(zone){
+      var svg = document.createElementNS(SVG_NS, 'svg');
+      svg.setAttribute('class', 'draw-layer');
+      svg.style.height = Math.max(zone.scrollHeight, zone.clientHeight) + 'px';
+      zone.appendChild(svg);
+      drawLayers.push({zone: zone, svg: svg});
+      wireDrawing(zone, svg);
+    });
+  }
+
+  function resizeDrawLayer(entry){
+    entry.svg.style.height = Math.max(entry.zone.scrollHeight, entry.zone.clientHeight) + 'px';
+  }
+
+  function wireDrawing(zone, svg){
+    var drawing = false;
+    var curPath = null;
+    var pts = [];
+
+    function pos(ev){
+      var rect = zone.getBoundingClientRect();
+      var cx = (ev.touches ? ev.touches[0].clientX : ev.clientX);
+      var cy = (ev.touches ? ev.touches[0].clientY : ev.clientY);
+      return { x: cx - rect.left + zone.scrollLeft, y: cy - rect.top + zone.scrollTop };
+    }
+
+    function startDraw(ev){
+      if(!penMode || penEraseMode || submitted) return;
+      var tag = ev.target.tagName;
+      if(['INPUT','SELECT','TEXTAREA','A'].indexOf(tag)!==-1) return;
+      drawing = true;
+      pts = [];
+      var p = pos(ev);
+      pts.push(p.x.toFixed(1)+','+p.y.toFixed(1));
+      curPath = document.createElementNS(SVG_NS, 'polyline');
+      curPath.setAttribute('points', pts.join(' '));
+      curPath.setAttribute('fill', 'none');
+      curPath.setAttribute('stroke', penColor==='red' ? '#e53935' : (penColor==='blue' ? '#1e88e5' : '#222'));
+      curPath.setAttribute('stroke-width', '2.2');
+      curPath.setAttribute('stroke-linecap', 'round');
+      curPath.setAttribute('stroke-linejoin', 'round');
+      svg.appendChild(curPath);
+      ev.preventDefault();
+    }
+    function moveDraw(ev){
+      if(!drawing || !curPath) return;
+      var p = pos(ev);
+      pts.push(p.x.toFixed(1)+','+p.y.toFixed(1));
+      curPath.setAttribute('points', pts.join(' '));
+      ev.preventDefault();
+    }
+    function endDraw(){
+      drawing = false;
+      curPath = null;
+      pts = [];
+    }
+    function eraseAt(ev){
+      if(!penEraseMode || submitted) return;
+      var p = pos(ev);
+      var els = svg.querySelectorAll('polyline');
+      for(var i=0;i<els.length;i++){
+        var el = els[i];
+        var box = el.getBBox();
+        var pad = 8;
+        if(p.x >= box.x-pad && p.x <= box.x+box.width+pad && p.y >= box.y-pad && p.y <= box.y+box.height+pad){
+          el.remove();
+        }
+      }
+    }
+
+    svg.addEventListener('mousedown', function(ev){
+      if(penEraseMode){ eraseAt(ev); return; }
+      startDraw(ev);
+    });
+    svg.addEventListener('mousemove', moveDraw);
+    svg.addEventListener('mouseup', endDraw);
+    svg.addEventListener('mouseleave', endDraw);
+    svg.addEventListener('touchstart', function(ev){
+      if(penEraseMode){ eraseAt(ev); return; }
+      startDraw(ev);
+    }, {passive:false});
+    svg.addEventListener('touchmove', moveDraw, {passive:false});
+    svg.addEventListener('touchend', endDraw);
+  }
+
+  function updatePenLayers(){
+    drawLayers.forEach(function(entry){
+      resizeDrawLayer(entry);
+      entry.svg.classList.toggle('pen-active', penMode && !penEraseMode);
+      entry.svg.classList.toggle('pen-erase', penMode && penEraseMode);
+    });
+  }
+
+  function initPenTool(){
+    var btn = document.getElementById('penBtn');
+    var eraseBtn = document.getElementById('penEraserBtn');
+    var colorBtns = document.querySelectorAll('.pen-color-btn');
+    if(!btn) return;
+    function setColorBtnsVisible(show){
+      colorBtns.forEach(function(b){ b.classList.toggle('show', show); });
+      if(eraseBtn) eraseBtn.classList.toggle('show', show);
+    }
+    colorBtns.forEach(function(b){
+      if(b.getAttribute('data-pc')===penColor) b.classList.add('active');
+      b.addEventListener('click', function(){
+        penColor = b.getAttribute('data-pc');
+        penEraseMode = false;
+        if(eraseBtn) eraseBtn.classList.remove('active');
+        colorBtns.forEach(function(o){ o.classList.remove('active'); });
+        b.classList.add('active');
+        updatePenLayers();
+      });
+    });
+    btn.addEventListener('click', function(){
+      penMode = !penMode;
+      btn.classList.toggle('active', penMode);
+      document.body.classList.toggle('pen-mode', penMode);
+      setColorBtnsVisible(penMode);
+      if(penMode){
+        eraserMode = false;
+        var er = document.getElementById('eraserBtn');
+        if(er) er.classList.remove('active');
+      } else {
+        penEraseMode = false;
+        if(eraseBtn) eraseBtn.classList.remove('active');
+      }
+      updatePenLayers();
+    });
+    if(eraseBtn){
+      eraseBtn.addEventListener('click', function(){
+        penEraseMode = !penEraseMode;
+        eraseBtn.classList.toggle('active', penEraseMode);
+        updatePenLayers();
+      });
+    }
+  }
+
+  /* ---------------- Post-submit dictionary lookup ---------------- */
+  function dictEsc(s){
+    return String(s).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+  function removeDictPopup(){
+    var el = document.getElementById('dictPopup');
+    if(el) el.remove();
+  }
+  function showDictPopup(innerHtml, rect, wide){
+    // keep existing popup element in place if it already exists (avoids losing
+    // scroll position while a multi-chunk translation is progressively updated)
+    var el = document.getElementById('dictPopup');
+    var isNew = !el;
+    if(!el){
+      el = document.createElement('div');
+      el.className = 'dict-popup';
+      el.id = 'dictPopup';
+      document.body.appendChild(el);
+    }
+    el.classList.toggle('dict-popup-wide', !!wide);
+    el.innerHTML = '<span class="dict-close">✕</span><div class="dict-body">' + innerHtml + '</div>';
+    el.querySelector('.dict-close').addEventListener('click', removeDictPopup);
+    if(isNew){
+      var popW = wide ? 480 : 320;
+      var top = rect.bottom + 8;
+      var left = rect.left;
+      var maxLeft = window.innerWidth - popW - 16;
+      if(left > maxLeft) left = Math.max(8, maxLeft);
+      if(left < 8) left = 8;
+      var maxTop = window.innerHeight - 90;
+      if(top > maxTop) top = Math.max(8, rect.top - 90);
+      el.style.top = Math.max(8,top) + 'px';
+      el.style.left = left + 'px';
+    }
+  }
+  // MyMemory's free/anonymous endpoint truncates or degrades quality on long queries
+  // (roughly >450-500 chars), so long selections are split into sentence-sized chunks
+  // and translated sequentially, then re-assembled — this is what makes long-passage
+  // translation actually show the FULL translated text instead of one short fragment.
+  function splitIntoChunks(text, maxLen){
+    var sentences = text.match(/[^.!?]+[.!?]*(\s+|$)/g) || [text];
+    var chunks = [];
+    var cur = '';
+    sentences.forEach(function(s){
+      if(s.length > maxLen){
+        // a single "sentence" is itself too long (no punctuation) — hard-split it
+        if(cur){ chunks.push(cur); cur = ''; }
+        for(var i=0;i<s.length;i+=maxLen){ chunks.push(s.slice(i, i+maxLen)); }
+        return;
+      }
+      if((cur+s).length > maxLen){
+        chunks.push(cur);
+        cur = s;
+      } else {
+        cur += s;
+      }
+    });
+    if(cur) chunks.push(cur);
+    return chunks.map(function(c){ return c.trim(); }).filter(Boolean);
+  }
+  function translateChunk(chunk){
+    return fetch('https://api.mymemory.translated.net/get?q='+encodeURIComponent(chunk)+'&langpair=en|vi')
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        var t = data && data.responseData && data.responseData.translatedText;
+        return t || '(không dịch được đoạn này)';
+      })
+      .catch(function(){ return '⚠ Lỗi kết nối dịch đoạn này.'; });
+  }
+  function doDictLookup(text, rect){
+    if(!text) return;
+    text = text.trim().replace(/\s+/g,' ');
+    if(!text) return;
+    var MAX_LOOKUP = 3000;
+    if(text.length > MAX_LOOKUP) text = text.slice(0, MAX_LOOKUP);
+
+    var isLong = text.length > 70;
+    if(!isLong){
+      showDictPopup('<b>'+dictEsc(text)+'</b><br>Đang dịch…', rect, false);
+      translateChunk(text).then(function(t){
+        showDictPopup('<b>'+dictEsc(text)+'</b><br>→ '+dictEsc(t), rect, false);
+      });
+      return;
+    }
+
+    // Long passage: chunk it, translate sequentially, render full original +
+    // full translation (both scrollable) so nothing gets cut short.
+    var chunks = splitIntoChunks(text, 450);
+    var translated = new Array(chunks.length).fill('');
+    function render(progressIdx){
+      var status = (progressIdx < chunks.length)
+        ? '<div class="dict-progress">Đang dịch… ('+(progressIdx+1)+'/'+chunks.length+')</div>' : '';
+      var html = '<div class="dict-orig"><b>Đoạn gốc:</b><br>'+dictEsc(text)+'</div>'
+        + '<div class="dict-trans"><b>Bản dịch:</b><br>'+dictEsc(translated.join(' ').trim() || '…')+'</div>'
+        + status;
+      showDictPopup(html, rect, true);
+    }
+    render(0);
+    var chain = Promise.resolve();
+    chunks.forEach(function(chunk, idx){
+      chain = chain.then(function(){
+        return translateChunk(chunk).then(function(t){
+          translated[idx] = t;
+          render(idx+1);
+        });
+      });
+    });
+  }
+
+  function enablePostExamTools(){
+    var tag = document.getElementById('dictModeTag');
+    if(tag) tag.classList.add('show');
+    var hlbar = document.getElementById('hlToolbar');
+    if(hlbar) hlbar.style.display = 'none';
+    var b = document.getElementById('warnBanner');
+    if(b) b.style.display = 'none';
+    var ov = document.getElementById('fsOverlay');
+    if(ov) ov.style.display = 'none';
+    document.body.classList.remove('pen-mode');
+    penMode = false; penEraseMode = false;
+    var pb = document.getElementById('penBtn'); if(pb) pb.classList.remove('active');
+    document.querySelectorAll('.pen-color-btn, #penEraserBtn').forEach(function(b){ b.classList.remove('show','active'); });
+    drawLayers.forEach(function(entry){ entry.svg.classList.remove('pen-active','pen-erase'); });
+    document.querySelectorAll('.explain-panel').forEach(function(p){ p.style.display = 'block'; });
+  }
+
+  /* ---------------- Grading helpers ---------------- */
+  function getRadio(name){
+    var el = document.querySelector('input[name="'+name+'"]:checked');
+    return el ? el.value : '';
+  }
+  function getChecked(name){
+    var out = [];
+    document.querySelectorAll('input[name="'+name+'"]:checked').forEach(function(el){ out.push(el.value); });
+    return out;
+  }
+  function getSelect(name){
+    var el = document.getElementById(name);
+    return el ? el.value : '';
+  }
+  function getText(name){
+    var el = document.getElementById(name);
+    return el ? el.value : '';
+  }
+  function textMatches(val, ansArr){
+    var v = norm(val);
+    if(!v) return false;
+    for(var i=0;i<ansArr.length;i++){ if(norm(ansArr[i])===v) return true; }
+    return false;
+  }
+
+  /* ---------------- Submit flow ---------------- */
+  window.requestSubmit = function(){
+    document.getElementById('confirmModal').classList.remove('hidden');
+  };
+  window.cancelSubmit = function(){
+    document.getElementById('confirmModal').classList.add('hidden');
+  };
+  window.confirmSubmit = function(){
+    document.getElementById('confirmModal').classList.add('hidden');
+    doSubmit();
+  };
+
+  function passageIndexOfQ(n){
+    return 0; // single-passage by-type test — always passage 0
+  }
+
+  function doSubmit(){
+    if(submitted) return;
+    submitted = true;
+    window.getViolationLog();
+    window.stopTimer();
+    var box = document.getElementById('timerBox');
+    if(box) box.style.display = 'none';
+    var tuModal = document.getElementById('timeUpModal');
+    if(tuModal) tuModal.classList.add('hidden');
+
+    var pScore = [0], pTotal = PASSAGE_COUNTS.slice();
+    var totalCorrect = 0;
+    var detailsParts = [];
+    var doneGroups = {};
+
+    UNITS.forEach(function(u){
+      if(u.type==='checkboxGroup'){
+        if(doneGroups[u.group]) return;
+        doneGroups[u.group] = true;
+        var chosen = getChecked(u.group);
+        var correct = ANS[u.group];
+        var matched = chosen.filter(function(v){ return correct.indexOf(v)!==-1; });
+        var score = Math.min(matched.length, u.max);
+        var pIdx = passageIndexOfQ(u.members[0]);
+        pScore[pIdx] += score;
+        totalCorrect += score;
+        // color options
+        document.querySelectorAll('input[name="'+u.group+'"]').forEach(function(inp){
+          var label = inp.closest('.opt-row');
+          if(!label) return;
+          if(inp.checked && correct.indexOf(inp.value)!==-1) label.classList.add('correct');
+          else if(inp.checked && correct.indexOf(inp.value)===-1) label.classList.add('incorrect');
+          else if(!inp.checked && correct.indexOf(inp.value)!==-1) label.style.outline = '2px dashed #e8b800';
+        });
+        var parts = chosen.map(function(v){ return v + (correct.indexOf(v)>=0 ? '✔' : '✘'); });
+        var missed = correct.filter(function(v){ return chosen.indexOf(v)<0; }).map(function(v){ return v+'(đáp án)'; });
+        detailsParts.push('Q'+u.members.join('-')+':['+parts.concat(missed).join(' ')+']');
+        return;
+      }
+      var n = u.n;
+      var pIdx = passageIndexOfQ(n);
+      var ok = false, val = '';
+      if(u.type==='radio'){
+        val = getRadio('q'+n);
+        ok = (val === ANS[n]);
+        document.querySelectorAll('input[name="q'+n+'"]').forEach(function(inp){
+          var label = inp.closest('.opt-row');
+          if(!label) return;
+          if(inp.value === ANS[n]) label.classList.add('correct');
+          else if(inp.checked) label.classList.add('incorrect');
+        });
+      } else if(u.type==='select'){
+        val = getSelect('q'+n);
+        ok = (val === ANS[n]);
+        var sel = document.getElementById('q'+n);
+        if(sel) sel.classList.add(ok?'correct-cell':'incorrect-cell');
+      } else { // text
+        val = getText('q'+n);
+        ok = textMatches(val, ANS[n]);
+        var inp2 = document.getElementById('q'+n);
+        if(inp2) inp2.classList.add(ok?'correct-cell':'incorrect-cell');
+        if(!ok){
+          var hint = document.getElementById('hint-q'+n);
+          if(hint) hint.textContent = ' (Đáp án: ' + ANS[n][0] + ')';
+        }
+      }
+      if(ok){ pScore[pIdx]++; totalCorrect++; }
+      detailsParts.push('Q'+n+':'+(ok?'✔':'✘')+'('+val+')');
+    });
+
+    // lock inputs
+    document.querySelectorAll('input,select,textarea').forEach(function(el){
+      if(el.id==='stuName'||el.id==='stuClass') return;
+      el.disabled = true;
+    });
+
+    enablePostExamTools();
+
+    var total = TOTAL_QUESTIONS;
+    var band = computeBand(totalCorrect, total);
+    var elapsedMs = Date.now() - window._testStartTime;
+    var elapsedMin = Math.floor(elapsedMs/60000), elapsedSec = Math.floor((elapsedMs%60000)/1000);
+    var timeTaken = elapsedMin+' phút '+elapsedSec+' giây';
+
+    showResult(pScore, pTotal, totalCorrect, total, band, timeTaken);
+
+    var vlog = { tabViolations: tabViolations, focusViolations: focusViolations, fsViolations: fsViolations };
+    sendLog('submit', 'Nộp bài — điểm ' + totalCorrect + '/' + total);
+    var payload = {
+      action: 'save_result_bytype',
+      timestamp: new Date().toISOString(),
+      student: window._studentName + ' — ' + window._studentClass,
+      qtype: (typeof QTYPE!=='undefined'?QTYPE:''),
+      testSource: (typeof TEST_SOURCE!=='undefined'?TEST_SOURCE:''),
+      score: totalCorrect,
+      total: total,
+      band: band,
+      timeTaken: timeTaken,
+      tabViol: vlog.tabViolations,
+      focusViol: vlog.focusViolations,
+      fsViol: vlog.fsViolations,
+      details: detailsParts.join(' | ')
+    };
+    fetch(APPS_SCRIPT_URL, {
+      method:'POST', mode:'no-cors',
+      headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body: JSON.stringify(payload)
+    }).catch(function(){});
+  }
+
+  function computeBand(score, total){
+    var s = Math.round(score/total*40);
+    if(s>=39) return '9';
+    if(s>=37) return '8.5';
+    if(s>=35) return '8';
+    if(s>=33) return '7.5';
+    if(s>=30) return '7';
+    if(s>=27) return '6.5';
+    if(s>=23) return '6';
+    if(s>=19) return '5.5';
+    if(s>=15) return '5';
+    if(s>=13) return '4.5';
+    if(s>=10) return '4';
+    return '< 4';
+  }
+
+  function showResult(pScore, pTotal, totalCorrect, total, band, timeTaken){
+    var box = document.getElementById('resultBox');
+    var pct = Math.round(totalCorrect/total*100);
+    var html = '<h3>Kết quả bài luyện tập — dạng ' + esc(typeof QTYPE!=='undefined'?QTYPE:'') + '</h3>';
+    html += '<p>Thí sinh: <b>'+esc(window._studentName)+'</b> — Lớp: <b>'+esc(window._studentClass)+'</b></p>';
+    html += '<p style="font-size:12.5px;color:#667;">'+esc(typeof TEST_SOURCE!=='undefined'?TEST_SOURCE:'')+'</p>';
+    html += '<p>Thời gian làm bài: <b>'+timeTaken+'</b></p>';
+    html += '<table><tr><th>Số câu đúng</th><th>Tỉ lệ</th></tr>';
+    html += '<tr><td><b>'+totalCorrect+'/'+total+'</b></td><td><b>'+pct+'%</b></td></tr></table>';
+    html += '<p>Band tham khảo (quy đổi theo thang 40 câu): <span class="band-badge">Band '+band+'</span></p>';
+    html += '<p style="font-size:12.5px;color:#667;">Báo cáo vi phạm — Chuyển tab: '+tabViolations+' | Mất focus: '+focusViolations+' | Thoát fullscreen: '+fsViolations+'</p>';
+    html += '<p style="font-size:12.5px;color:#667;">Các ô được tô <span style="color:var(--green);font-weight:700;">xanh</span> là đáp án đúng, tô <span style="color:var(--red);font-weight:700;">đỏ</span> là sai. Đáp án đúng bị bỏ sót (checkbox) được viền nét đứt vàng.</p>';
+    box.innerHTML = html;
+    document.getElementById('resultModal').classList.remove('hidden');
+  }
+  window.closeResult = function(){
+    document.getElementById('resultModal').classList.add('hidden');
+  };
+  function esc(s){
+    return String(s).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+
+  /* ---------------- Init (script is at end of body, DOM already ready — wire directly) ---------------- */
+  initHighlightToolbar();
+  initHighlightZones();
+  initSelectedAnswerHighlight();
+  initDrawLayers();
+  initPenTool();
+  initDivider();
+  if(window.CHECKBOX_GROUPS){
+    window.CHECKBOX_GROUPS.forEach(function(g){ window.wireCheckboxLimit(g.name, g.max); });
+  }
+
+})();
+
+</script>
+</body>
+</html>
