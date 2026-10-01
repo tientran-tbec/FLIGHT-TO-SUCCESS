@@ -749,10 +749,10 @@ Nội dung nguồn các test:
 Vậy là cả 10 test (Test1_Reading.html → Test10_Reading.html) hiện đã đồng bộ, dùng chung 1 engine,
 và đều có giải thích song ngữ Anh-Việt chi tiết, trích dẫn nguyên văn cho từng câu.
 
-## CẬP NHẬT — WEB TEST THEO DẠNG CÂU HỎI (WebTest_TheoDang/)
+## CẬP NHẬT — WEB TEST THEO DẠNG CÂU HỎI (04_WebTest_TheoDang/)
 
 Đã tạo 74 web test riêng lẻ, mỗi file chỉ gồm 1 passage + các câu hỏi thuộc
-đúng 1 dạng, nằm trong `WebTest_TheoDang/<TenDang>/Test{N}_Passage{P}_{DANG}.html`:
+đúng 1 dạng, nằm trong `04_WebTest_TheoDang/<TenDang>/Test{N}_Passage{P}_{DANG}.html`:
 
 - Completion/     — 30 file, 158 câu (Sentence/Note/Table/Summary completion)
 - Matching/        — 14 file, 94 câu (heading/info/feature/people/sentence-ending)
@@ -799,8 +799,8 @@ thay thế mọi tham chiếu vị trí cũ (ở gốc thư mục) trong tài li
 - `01_De_Goc_Word/` — các file Word đề gốc (NEW - TEST 1-5.docx, TEST 6-10.docx, TRỘN KEY 20 TEST.docx)
 - `02_WebTest_FullTest/` — 10 file Test1_Reading.html … Test10_Reading.html (bản đầy đủ 3 passage)
 - `03_TaiLieu_TheoDang_Word/` — 5 file Word tổng hợp theo dạng câu hỏi (trước đây ở "Theo dang cau hoi/")
-- `WebTest_TheoDang/` — không đổi (74 web test theo dạng + code.gs)
-- `HUONG_DAN/` — không đổi (file Word hướng dẫn đổi Sheet/Apps Script/GitHub)
+- `04_WebTest_TheoDang/` — không đổi (74 web test theo dạng + code.gs)
+- `05_HUONG_DAN/` — không đổi (file Word hướng dẫn đổi Sheet/Apps Script/GitHub)
 
 `update_links.py` và `push_github.bat` vẫn nằm ở thư mục gốc `03. READING` và hoạt động
 bình thường (quét toàn bộ thư mục con), không cần sửa gì khi cấu trúc trên thay đổi.

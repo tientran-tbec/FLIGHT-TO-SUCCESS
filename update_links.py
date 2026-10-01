@@ -6,7 +6,7 @@ DOI LINK GOOGLE SHEET / APPS SCRIPT CHO TOAN BO HE THONG
 Dan 1 hoac 2 link vao, script tu nhan dien va cap nhat dung noi:
 
   - Link Google Sheet (dang .../spreadsheets/d/<ID>/...)
-      -> cap nhat SHEET_ID trong WebTest_TheoDang/code.gs
+      -> cap nhat SHEET_ID trong 04_WebTest_TheoDang/code.gs
          (dung khi ban doi SANG MOT GOOGLE SHEET KHAC, van dung
           chung 1 Apps Script / 1 URL web app nhu hien tai)
 
@@ -30,8 +30,8 @@ code.public.gs (an API key thuc) de dong bo voi GitHub.
 import sys, re, glob, os
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
-GS_FILE = os.path.join(ROOT, "WebTest_TheoDang", "code.gs")
-GS_PUBLIC_FILE = os.path.join(ROOT, "WebTest_TheoDang", "code.public.gs")
+GS_FILE = os.path.join(ROOT, "04_WebTest_TheoDang", "code.gs")
+GS_PUBLIC_FILE = os.path.join(ROOT, "04_WebTest_TheoDang", "code.public.gs")
 
 SHEET_RE = re.compile(r"docs\.google\.com/spreadsheets/d/([a-zA-Z0-9_-]+)")
 SCRIPT_RE = re.compile(r"https://script\.google\.com/macros/s/[a-zA-Z0-9_-]+/exec")
